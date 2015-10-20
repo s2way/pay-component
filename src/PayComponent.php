@@ -30,7 +30,6 @@ class PayComponent {
         $this->requester->create();
             // $this->requester->getError();
             // return redirect $data->returnURL;
-        
 
         $this->requester->process();
             // $this->requester->getError();

@@ -34,6 +34,7 @@ abstract class Payment {
 
 	public function validate() {
 		$this->data['auth_token'] = $this->authToken;
+
 		if (!$this->validator->validate($this->rules(), $this->data)) {
 			throw new InvalidArgumentException($this->validator->getError());
 		}

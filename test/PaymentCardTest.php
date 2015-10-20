@@ -22,24 +22,10 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-      * @expectedException InvalidArgumentException
-      * @expectedExceptionMessage some error
-    **/
-    public function testValidateException() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
-        $validator->expects($this->any())->method('validate')->willReturn(false);
-        $validator->expects($this->any())->method('getError')->willReturn('some error');
-        $pay = new PaymentCard($validator);
-        $pay->validate();
-    }
-
-    public function testValidatePassed() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
-        $validator->expects($this->any())->method('validate')->willReturn(true);
-        $pay = new PaymentCard($validator);
-        $pay->validate();
-        $this->assertEmpty($validator->getError());
-    }
+     ********************************
+     ***** TESTS PARENT METHODS *****
+     ********************************
+     */
 
     public function testSetData() {
         $expectedData = array(
@@ -59,8 +45,34 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     /**
       * @expectedException InvalidArgumentException
+      * @expectedExceptionMessage some error
+    */
+    public function testValidateException() {
+        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
+        $validator->expects($this->any())->method('validate')->willReturn(false);
+        $validator->expects($this->any())->method('getError')->willReturn('some error');
+        $pay = new PaymentCard($validator);
+        $pay->validate();
+    }
+
+    public function testValidatePassed() {
+        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
+        $validator->expects($this->any())->method('validate')->willReturn(true);
+        $pay = new PaymentCard($validator);
+        $pay->validate();
+        $this->assertEmpty($validator->getError());
+    }
+
+    /**
+     *******************************
+     ***** TESTS CLASS METHODS *****
+     *******************************
+     */
+
+    /**
+      * @expectedException InvalidArgumentException
       * @expectedExceptionMessage Invalid auth_token.
-      */
+    */
     public function testAuthTokenNotEmpty() {
         $pay = new PaymentCard();
         
@@ -90,7 +102,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
 
     /**
-     * @expectedExceptionMessage Descrip
+     * @expectedExceptionMessage Description is too long.
      * @expectedException InvalidArgumentException
      */
     public function testDescriptionMaxLength() {
@@ -100,7 +112,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -115,7 +126,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -130,7 +140,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -145,7 +154,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -160,7 +168,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -175,7 +182,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -190,7 +196,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -205,7 +210,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -220,7 +224,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -235,29 +238,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
-
-    // /*
-    //  * @expectedException InvalidArgumentException
-    //  * @expectedExceptionMessage Invalid due_date.
-    //  */
-    // public function testInvalidDueDate() {
-    //     $pay = new PaymentCard();
-
-    //     $this->data['due_date'] = '';
-
-    //     $pay->setAuthToken('any');
-    //     $pay->setData($this->data);
-        
-    //     $pay->validate();
-    // }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid due_date length.
-     */
+    */
     public function testInvalidDueDateLength() {
         $pay = new PaymentCard();
 
@@ -265,14 +252,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage due_date must be numeric.
-     */
+    */
     public function testDueDateNumeric() {
         $pay = new PaymentCard();
 
@@ -280,14 +266,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage sec_code_status is invalid.
-     */
+    */
     public function testInvalidSecCodeStatus() {
         $pay = new PaymentCard();
 
@@ -295,14 +280,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid security_code length.
-     */
+    */
     public function testSecurityCodeLength() {
         $pay = new PaymentCard();
 
@@ -310,14 +294,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid security_code.
-     */
+    */
     public function testInvalidSecurityCode() {
         $pay = new PaymentCard();
 
@@ -326,14 +309,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage security_code must be numeric.
-     */
+    */
     public function testSecurityCodeNumeric() {
         $pay = new PaymentCard();
 
@@ -341,14 +323,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage card_holder is too long
-     */
+    */
     public function testCardHolderTooLong() {
         $pay = new PaymentCard();
 
@@ -356,29 +337,26 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Unknown payment_type.
-     */
+    */
     public function testUnknownPaymentType() {
         $pay = new PaymentCard();
 
-        $this->data['payment_type'] = 'Unknown payment_type';
-
+        $this->data['payment_type'] = 'Unknown_payment_type';
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Invalid issuer for this payment type.
-     */
+    */
     public function testPaymentTypeInvalidIssuer() {
         $pay = new PaymentCard();
 
@@ -387,14 +365,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid installments.
-     */
+     * @expectedExceptionMessage Invalid installments for this payment_type.
+    */
     public function testInstallmentsTooLong() {
         $pay = new PaymentCard();
 
@@ -403,14 +380,13 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage The payment type allows only 1 installment.
-     */
+    */
     public function testInstallmentsPaymentType() {
         $pay = new PaymentCard();
 
@@ -419,7 +395,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
         $pay->setAuthToken('any');
         $pay->setData($this->data);
-        
         $pay->validate();
     }
 
@@ -438,6 +413,5 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
             $this->assertEquals("Invalid $field.", $e->getMessage());
             $this->assertEquals('InvalidArgumentException', get_class($e));
         }
-
     }
 }
