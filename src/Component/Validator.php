@@ -80,6 +80,18 @@ class Validator {
 		return true;
 	}
 
+	/**
+	 * Caso o tipo de pagamento for por token, não poderá aceitar forma de pagamento debito
+	 */
+	public function tokenPaymentType($check, $params, $data) {
+		if(array_key_exists('token', $data)) {
+			if($data['payment_type'] === 'debito'){
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 
 /**
