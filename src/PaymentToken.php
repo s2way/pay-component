@@ -4,6 +4,13 @@ require_once 'src/Payment.php';
 
 class PaymentToken extends Payment {
 
+    public function getCreationData() {
+        // return array_intersect_key($this->data, array_flip($this->creationFields));
+    }
+
+    public function getProcessData() {
+    }
+
 
     public function rules() {
         

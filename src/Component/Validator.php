@@ -11,12 +11,14 @@ class Validator {
 
 				$params = array_key_exists('params', $rule) ? $rule['params'] : null;
 
-				if(!$this->$methodName($data["$field"], $params, $data)) {
+				if (!$this->$methodName($data["$field"], $params, $data)) {
 					$this->setError($rule['message']);
 					return;
 				}
 			}
 		}
+
+		return true;
 	}
 
 	public function setError($errorMessage){
@@ -811,7 +813,7 @@ class Validator {
  * @return boolean Success
  */
 	public function inList($check, $list) {
-		return in_array($check, $list, true);
+		return in_array($check, $list);
 	}
 
 /**

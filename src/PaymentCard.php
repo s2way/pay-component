@@ -4,6 +4,34 @@ require_once 'src/Payment.php';
 
 class PaymentCard extends Payment {
 
+	private $URL = null;
+	private $token = null;
+	private $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url');
+	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token');
+
+	public function getCreationData() {
+		return array_intersect_key($this->data, array_flip($this->creationFields));
+	}
+
+	public function getProcessData() {
+		return array_intersect_key($this->data, array_flip($this->processFields));
+	}
+
+	public function setAuthenticationURL($url) {
+		$this->URL = $url;
+	}
+
+	public function getAuthenticationURL() {
+		return $this->URL;
+	}
+
+	public function setToken($token) {
+		$this->token = $token;
+	}
+
+	public function getToken() {
+		return $this->token;
+	}
 
 	public function rules() {
 		return array(
@@ -142,5 +170,5 @@ class PaymentCard extends Payment {
 				)
 			),
 		);
-	}
-}
+	}// End Method 'rules'
+}// End Class
