@@ -39,6 +39,14 @@ abstract class Payment {
         return $this->id;
     }
 
+    public function setReturnURL($url) {
+        $this->returnURL = $url;
+    }
+
+    public function getReturnURL() {
+        return $this->returnURL;
+    }
+
     public function validate() {
         $this->data['auth_token'] = $this->authToken;
 

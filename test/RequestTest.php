@@ -8,21 +8,20 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function setUp() {
 
         $this->paymentCard = new PaymentCard();
-        $this->paymentCard->setData(
-            array(
-                'description' => 'Description test',
-                'amount' => 123456,
-                'return_url' => 'http://www.google.com.br',
-                'issuer' => 'visa',
-                'card_number' => '153241251234',
-                'due_date' => '072015',
-                'sec_code_status' => 1,
-                'security_code' => 619,
-                'card_holder' => 'TEST NAME',
-                'payment_type' => 'debito',
-                'installments' => 1
-            )
+        $this->paymentData = array(
+            'description' => 'Description test',
+            'amount' => 123456,
+            'return_url' => 'http://www.google.com.br',
+            'issuer' => 'visa',
+            'card_number' => '153241251234',
+            'due_date' => '072015',
+            'sec_code_status' => 1,
+            'security_code' => 619,
+            'card_holder' => 'TEST NAME',
+            'payment_type' => 'debito',
+            'installments' => 1
         );
+        $this->paymentCard->setData($this->paymentData);
     }
 
     public function testSetterPayment() {
@@ -65,9 +64,9 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodCreationSuccess(){
         $expectedData = '"123456789abcdefg"';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getStatus', 'getResponse'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
-        $mockedHttpConnector->expects($this->any())->method('getStatus')->willReturn(200);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(200);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedData);
 
         $requester = new Requester($mockedHttpConnector);
@@ -81,6 +80,82 @@ class RequestTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($requester->create());
         $this->assertNull($requester->getError());
+    }
+
+    public function testMethodProcessError() {
+        $orderId = 'wepoijfasldkfjwope';
+        $baseURL = 'http://base.url';
+        $expectedError = 'some error';
+        $expectedURL = "{$baseURL}/orders/{$orderId}";
+
+        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getError', 'setURL'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
+        $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
+        $mockedHttpConnector->expects($this->any())->method('setURL')->will($this->returnCallback(function($url) use ($expectedURL) {
+            $this->assertEquals($expectedURL, $url);
+        }));
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setBaseURL($baseURL);
+        $this->paymentCard->setId($orderId);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertFalse($requester->process());
+        $this->assertEquals($expectedError, $requester->getError());
+    }
+
+    public function testMethodProcessSuccess() {
+        $expectedResponse = '{"authentication_url": "http://somerul.com", "token" : "token1"}';
+
+        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
+        
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertTrue($requester->process());
+        $this->assertNull($requester->getError());
+        $this->assertEquals('http://somerul.com', $this->paymentCard->getReturnURL());
+        $this->assertEquals('token1', $this->paymentCard->getToken());
+    }
+
+    public function testMethodProcessSuccessWithoutAuthURL() {
+        $expectedResponse = '{"return_url": "http://somerul.com", "token" : "token1"}';
+
+        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
+        
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertTrue($requester->process());
+        $this->assertNull($requester->getError());
+        $this->assertEquals('http://somerul.com', $this->paymentCard->getReturnURL());
+        $this->assertEquals('token1', $this->paymentCard->getToken());
+    }
+
+    public function testMethodProcessSuccessWithPurchaseByToken() {
+        $expectedResponse = '{"return_url": "http://somerul.com"}';
+
+        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
+        
+        $payment = new PaymentToken();
+        $this->paymentData['token'] = 'weijwr0329esofk';
+        $payment->setData($this->paymentData);
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setPayment($payment);
+
+        $this->assertTrue($requester->process());
+        $this->assertNull($requester->getError());
+        $this->assertEquals('http://somerul.com', $payment->getReturnURL());
     }
 
 
