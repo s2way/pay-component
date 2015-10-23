@@ -52,15 +52,17 @@ class HttpConnector {
 
         if ($error) {
             $this->error = $error;
-            die(var_dump($error, $info['http_code'], $resp, $this->URL));
             return false;
-
         }
 
         $this->status = $info['http_code'];
         $this->response = $resp;
         return true;
 
+    }
+
+    public function requestSucceded() {
+        return in_array($this->status, [200, 201, 202]);
     }
 
     public function setMethod($method){
@@ -76,6 +78,7 @@ class HttpConnector {
     public function getStatus(){
         return $this->status;
     }
+
     public function getResponse(){
         return $this->response;
     }

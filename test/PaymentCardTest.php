@@ -427,7 +427,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         }
     }
 
-
     public function testCreationData() {
         $this->data['auth_token'] = 'any';
 

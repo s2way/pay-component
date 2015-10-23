@@ -18,14 +18,6 @@ class PaymentCard extends Payment {
 		return array_intersect_key($this->data, array_flip($this->processFields));
 	}
 
-	public function setAuthenticationURL($url) {
-		$this->URL = $url;
-	}
-
-	public function getAuthenticationURL() {
-		return $this->URL;
-	}
-
 	public function setToken($token) {
 		$this->token = $token;
 	}
