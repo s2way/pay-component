@@ -1,6 +1,7 @@
 <?php
 
-require_once 'Component/HttpConnector.php';
+// require_once 'Component/HttpConnector.php';
+require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Component' . DS .  'HttpConnector.php');
 
 class Requester {
 

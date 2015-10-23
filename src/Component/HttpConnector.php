@@ -1,6 +1,7 @@
 <?php
 
-require_once 'src/Constants.php';
+ // require_once 'src/Constants.php';
+require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Constants.php');
 
 class HttpConnector {
 

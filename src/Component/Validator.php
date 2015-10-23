@@ -66,7 +66,7 @@ class Validator {
 	 * Valida se é um email válido
 	 */
 	public function url ($check, $params, $data){
-		$regex = "/^((http|https)?):\/\/([a-zA-Z0-9_-]+)(\.[a-zA-Z0-9_-]+)+(\/[a-zA-Z0-9_-]+)*\/?$/i";
+		$regex = "/^((http|https)?):\/\/([a-zA-Z0-9_-]+)(\.[a-zA-Z0-9_-]+)+(\:\d{4}|)(\/[a-zA-Z0-9_-]+)*\/?$/i";
 		return $this->_check($check, $regex);
 	}
 
@@ -75,7 +75,8 @@ class Validator {
 	 */
 	public function paymentTypeIssuer($check, $params, $data) {
 		if($check === 'debito') {
-			if(!$this->inList($data['issuer'], ['master', 'visa'])) {
+			$validIssuersForDebit = array('master', 'visa');
+			if(!$this->inList($data['issuer'], $validIssuersForDebit)) {
 				return false;
 			}
 		}

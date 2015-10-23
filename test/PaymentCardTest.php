@@ -201,6 +201,16 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $pay->validate();
     }
 
+    public function testReturnURLWithSubdomain() {
+        $pay = new PaymentCard();
+
+        $this->data['return_url'] = 'http://desenv.localhost:8080/cliente';
+
+        $pay->setAuthToken('any');
+        $pay->setData($this->data);
+        $pay->validate();
+    }
+
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Unknown issuer.

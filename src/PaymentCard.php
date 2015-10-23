@@ -1,6 +1,7 @@
 <?php
 
-require_once 'src/Payment.php';
+// require_once 'src/Payment.php';
+require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Payment.php');
 
 class PaymentCard extends Payment {
 
