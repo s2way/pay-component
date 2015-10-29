@@ -1,9 +1,11 @@
-// <?php
+<?php
 
-require_once 'src/PaymentToken.php';
-require_once 'src/Component/Validator.php';
+use PayComponent\PaymentToken;
+use PayComponent\Component\Validator;
 
 class PaymentTokenTest extends PHPUnit_Framework_TestCase {
+
+    private $field = null;
 
     public function setUp() {
         $this->data = array(
@@ -22,6 +24,44 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
      ********************************
      ***** TESTS PARENT METHODS *****
      ********************************
+    */
+
+    public function testSetAuthToken() {
+        $expectedData = 'someToken';
+        $pay = new PaymentToken();
+        $pay->setAuthToken($expectedData);
+        $this->assertEquals($expectedData, $pay->getAuthToken());
+    }
+
+    public function testSetId() {
+        $expectedData = 123;
+        $pay = new PaymentToken();
+        $pay->setId($expectedData);
+        $this->assertEquals($expectedData, $pay->getId());
+    }
+
+    public function testValidateErrors() {
+        $validator = $this->getMockBuilder('PayComponent\Component\Validator')->setMethods(array('validate', 'getValidationErrors'))->getMock();
+        $validator->expects($this->any())->method('validate')->willReturn(false);
+        $validator->expects($this->any())->method('getValidationErrors')->willReturn('some error');
+        $pay = new PaymentToken($validator);
+        $this->assertFalse($pay->validate());
+        $this->assertEquals('some error', $pay->getErrors());
+    }
+
+    public function testValidatePassed() {
+        $validator = $this->getMockBuilder('PayComponent\Component\Validator')->setMethods(array('validate', 'getValidationErrors'))->getMock();
+        $validator->expects($this->any())->method('validate')->willReturn(true);
+        $pay = new PaymentToken($validator);
+        $this->assertTrue($pay->validate());
+        $this->assertNull($pay->getErrors());
+        $this->assertEmpty($validator->getValidationErrors());
+    }
+
+    /**
+     *******************************
+     ***** TESTS CLASS METHODS *****
+     *******************************
      */
 
     public function testCreationData() {
@@ -49,7 +89,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
             'payment_type' => $this->data['payment_type'],
             'installments' => $this->data['installments'],
             'auth_token' => $this->data['auth_token'],
-            'token'=> $this->data['token']
+            'token' => $this->data['token']
         );
         $pay = new PaymentToken();
         $pay->setAuthToken($this->data['auth_token']);
@@ -57,279 +97,167 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $pay->getProcessData());
     }
 
-    public function testSetAuthToken() {
-        $expectedData = 'someToken';
-        $pay = new PaymentToken();
-        $pay->setAuthToken($expectedData);
-        $this->assertEquals($expectedData, $pay->getAuthToken());
-    }
-
-    /**
-      * @expectedException InvalidArgumentException
-      * @expectedExceptionMessage some error
-    */
-    public function testValidateException() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
-        $validator->expects($this->any())->method('validate')->willReturn(false);
-        $validator->expects($this->any())->method('getError')->willReturn('some error');
-        $pay = new PaymentToken($validator);
-        $pay->validate();
-    }
-
-    public function testValidatePassed() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
-        $validator->expects($this->any())->method('validate')->willReturn(true);
-        $pay = new PaymentToken($validator);
-        $pay->validate();
-        $this->assertEmpty($validator->getError());
-    }
-
-    /**
-     *******************************
-     ***** TESTS CLASS METHODS *****
-     *******************************
-     */
-
-    /**
-      * @expectedException InvalidArgumentException
-      * @expectedExceptionMessage Invalid auth_token.
-    */
     public function testAuthTokenNotEmpty() {
+
+        $expectedError = array(
+            'auth_token' => array('Invalid auth_token.')
+        );
+
         $pay = new PaymentToken();
-        
         $pay->setData($this->data);
-        $pay->validate();
+        $this->assertFalse($pay->validate());
+        $this->assertEquals($expectedError, $pay->getErrors());
     }
 
-    public function testDescriptionNotEmpty() {$this->validateNotEmpty('description');}
+    public function testDescriptionNotEmpty() {$this->validateFields('description');}
 
-    public function testAmountNotEmpty() {$this->validateNotEmpty('amount');}
+    public function testAmountNotEmpty() {$this->validateFields('amount');}
 
-    public function testReturnURLNotEmpty() {$this->validateNotEmpty('return_url');}
+    public function testReturnURLNotEmpty() {$this->validateFields('return_url');}
 
-    public function testIssuerNotEmpty() {$this->validateNotEmpty('issuer');}
+    // public function testIssuerNotEmpty() {
 
-    public function testPaymentTypeNotEmpty() {$this->validateNotEmpty('payment_type');}
+    //     $expectedError = array(
+    //         'issuer' => array('Invalid issuer.'),
+    //         'payment_type' => array('Invalid issuer for this payment type.')
+    //     );
 
-    public function testInstallmentsNotEmpty() {$this->validateNotEmpty('installments');}
+    //     $this->validateFields('issuer', $expectedError);
+    // }
 
-    public function testTokenNotEmpty() {$this->validateNotEmpty('token');}
+    public function testPaymentTypeNotEmpty() {$this->validateFields('payment_type');}
 
-    /**
-     * @expectedExceptionMessage Description is too long.
-     * @expectedException InvalidArgumentException
-     */
+    public function testInstallmentsNotEmpty() {$this->validateFields('installments');}
+
     public function testDescriptionMaxLength() {
-        $pay = new PaymentToken();
-
-        $this->data['description'] = implode(array_fill(0, 1025, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'description';
+        $expectedError = array($this->field => array('Description is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 1025, 'm'));
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The amount should be in cents.
-     */
     public function testAmoutNaturalNumberWithDot() {
-        $pay = new PaymentToken();
-
-        $this->data['amount'] = 2.33;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $this->data[$this->field] = 2.33;
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The amount should be in cents.
-     */
     public function testAmoutNaturalNumberWithComma() {
-        $pay = new PaymentToken();
-
-        $this->data['amount'] = '2,33';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $this->data[$this->field] = '2,33';
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Amount must be positive.
-     */
     public function testAmoutNaturalNumberNegative() {
-        $pay = new PaymentToken();
-
-        $this->data['amount'] = -2.33;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount must be positive.'));
+        $this->data[$this->field] = -2.33;
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Amount is too long.
-     */
+    public function testAmoutStringNaturalNumberNegative() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount must be positive.'));
+        $this->data[$this->field] = '-2,33';
+        $this->validateFields(null, $expectedError);
+    }
+
     public function testAmoutTooLong() {
-        $pay = new PaymentToken();
-
-        $this->data['amount'] = implode(array_fill(0, 13, '1'));;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Return URL is too long.
-     */
     public function testReturnURLTooLong() {
-        $pay = new PaymentToken();
-
-        $this->data['return_url'] = implode(array_fill(0, 2049, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Return URL is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 2049, 'm'));
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid return_url.
-     */
     public function testReturnURLInvalid() {
-        $pay = new PaymentToken();
-
-        $this->data['return_url'] = 'https://www.google.';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Invalid return_url.'));
+        $this->data[$this->field] = 'https://www.google.';
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unknown issuer.
-     */
-    public function testUnknownIssuer() {
-        $pay = new PaymentToken();
-
-        $this->data['issuer'] = 'other issuer';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+    public function testReturnURLWithSubdomain() {
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Invalid return_url.'));
+        $this->data[$this->field] = 'http://desenv.localhost:a156156/cliente';
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unknown payment_type.
-    */
+    // public function testUnknownIssuer() {
+    //     $this->field = 'issuer';
+    //     $expectedError = array(
+    //         $this->field => array('Unknown issuer.'),
+    //         'payment_type' => array('Invalid issuer for this payment type.')
+    //     );
+    //     $this->data[$this->field] = 'other issuer';
+    //     $this->validateFields(null, $expectedError);
+    // }
+
     public function testUnknownPaymentType() {
-        $pay = new PaymentToken();
-
-        $this->data['payment_type'] = 'Unknown_payment_type';
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'payment_type';
+        $expectedError = array($this->field => array('Unknown payment_type.'));
+        $this->data[$this->field] = 'Unknown_payment_type';
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid issuer for this payment type.
-    */
-    public function testPaymentTypeInvalidIssuer() {
-        $pay = new PaymentToken();
+    // public function testPaymentTypeInvalidIssuer() {
+    //     $this->field = 'payment_type';
+    //     $expectedError = array($this->field => array('Invalid issuer for this payment type.'));
+    //     $this->data[$this->field] = 'debito';
+    //     $this->data['issuer'] = 'amex';
+    //     $this->validateFields(null, $expectedError);
+    // }
 
-        $this->data['payment_type'] = 'debito';
-        $this->data['issuer'] = 'amex';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid installments for this payment_type.
-    */
     public function testInstallmentsTooLong() {
-        $pay = new PaymentToken();
-
-        $this->data['installments'] = 9;
+        $this->field = 'installments';
+        $expectedError = array($this->field => array('Invalid installments for this payment_type.'));
+        $this->data[$this->field] = 9;
         $this->data['payment_type'] = 'credito_parcelado_loja';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->validateFields(null, $expectedError);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The payment type allows only 1 installment.
-    */
     public function testInstallmentsPaymentType() {
-        $pay = new PaymentToken();
-
-        $this->data['installments'] = 2;
-        $this->data['payment_type'] = 'debito';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
+        $this->field = 'installments';
+        $expectedError = array($this->field => array('The payment type allows only 1 installment.'));
+        $this->data[$this->field] = 2;
+        $this->data['payment_type'] = 'credito_a_vista';
+        $this->validateFields(null, $expectedError);
     }
 
     /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage token is too long
-    */
-    public function testTokenTooLong() {
-        $pay = new PaymentToken();
+     * Método auxiliar na validação dos campos
+     * $field = Caso recebido, indica teste de emptyFields
+     * $expectedError = Utilizado quando um campo influencia em validações de outro campo. 
+     *  Ex: Issuer, que influencia no teste do campo 'payment_type'
+     */
+    private function validateFields($field = null, $expectedError = null) {
 
-        $this->data['token'] = implode(array_fill(0, 101, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Payment type debit not supported process with token
-    */
-    public function testTokenPaymentDebit() {
-        $pay = new PaymentToken();
-
-        $this->data['token'] = '1234567890abcdefghi';
-        $this->data['payment_type'] = 'debito';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-
-
-    private function validateNotEmpty($field) {
-        $pay = new PaymentToken();
-
-        $this->data[$field] = null;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        
-        try {
-            $pay->validate();
-            $this->fail();
-        } catch (Exception $e) {
-            $this->assertEquals("Invalid $field.", $e->getMessage());
-            $this->assertEquals('InvalidArgumentException', get_class($e));
+        // Caso for uma validação de emptyFields, utiliza mensagem padrão de erros
+        if ($expectedError == null) {
+            $expectedError = array(
+                "$field" => array("Invalid $field.")
+            );
         }
+        // Caso campo for passado de parâmetro, indica teste emptyField
+        if ($field != null){
+            $this->data[$field] = null;
+        }
+
+        $pay = new PaymentToken();
+        $pay->setAuthToken('any');
+        $pay->setData($this->data);
+
+        $this->assertFalse($pay->validate());
+        $this->assertEquals($expectedError, $pay->getErrors());
     }
+
 }

@@ -1,13 +1,13 @@
 <?php
 
-// require_once 'src/Payment.php';
-require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Payment.php');
+namespace PayComponent;
+
+use PayComponent\Payment;
 
 class PaymentCard extends Payment {
 
 	private $URL = null;
 	private $token = null;
-	private $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url');
 	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token');
 
 	public function getCreationData() {

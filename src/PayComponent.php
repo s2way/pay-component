@@ -1,16 +1,16 @@
 <?php
 
-require_once 'Component/Validator.php';
-require_once 'PaymentCard.php';
-require_once 'PaymentToken.php';
-require_once 'Requester.php';
-require_once 'Constants.php';
+namespace PayComponent;
+use PayComponent\Component\Validator;
+
+require_once ('Constants.php');
 
 class PayComponent {
 
     // Class properties
     private $payURL = null;
     private $authToken = null;
+    private $noAutentication = 0;
     private $error = null;
     // Injected properties
     private $paymentCard = null;
@@ -23,38 +23,29 @@ class PayComponent {
         $this->requester = $requester ? $requester : new Requester();
     }
 
-    public function purchaseByCard($data = null) {
+    public function purchaseByCard($data) {
         $this->paymentCard->setData($data);
         $this->paymentCard->setAuthToken($this->authToken);
-        $this->paymentCard->validate();
 
+        if (!$this->paymentCard->validate()){
+            $this->error = $this->paymentCard->getErrors();
+            return false;
+        }
         $this->payment = $this->paymentCard;
+
         return $this->request();
     }
 
     public function purchaseByToken($data = null) {
         $this->paymentToken->setData($data);
         $this->paymentToken->setAuthToken($this->authToken);
-        $this->paymentToken->validate();
+        if (!$this->paymentCard->validate()){
+            $this->error = $this->paymentCard->getErrors();
+            return false;
+        }
 
         $this->payment = $this->paymentToken;
         return $this->request();
-    }
-
-    public function setAuthToken($authToken) {
-        $this->authToken = $authToken;
-    }
-
-    public function getError() {
-        return $this->error;
-    }
-
-    public function getToken() {
-        return $this->requester->getPayment()->getToken();
-    }
-
-    public function getRedirectURL() {
-        return $this->requester->getPayment()->getReturnURL();
     }
 
     private function request() {
@@ -72,6 +63,26 @@ class PayComponent {
         }
 
         return true;
+    }
+
+    public function setAuthToken($authToken) {
+        $this->authToken = $authToken;
+    }
+
+    public function setNoAutentication($noAutentication) {
+        $this->noAutentication = $noAutentication;
+    }
+
+    public function getError() {
+        return $this->error;
+    }
+
+    public function getToken() {
+        return $this->requester->getPayment()->getToken();
+    }
+
+    public function getRedirectURL() {
+        return $this->requester->getPayment()->getReturnURL();
     }
 
 }

@@ -1,32 +1,39 @@
 <?php
 
+namespace PayComponent\Component;
+
 class Validator {
 
-	private $error = null;
+	private $validationErrors = array();
 
 	public function validate($listRules, $data) {
 
+		// Varre lista dos camposs
 		foreach ($listRules as $field => $rules) {
+			// Varre lista das regras de cada campo
 			foreach ($rules as $methodName => $rule) {
-
+				// Valida se foi passado parametros para a validação
 				$params = array_key_exists('params', $rule) ? $rule['params'] : null;
-
+				// Valida a regra
 				if (!$this->$methodName($data["$field"], $params, $data)) {
-					$this->setError($rule['message']);
-					return;
+					// Verifica se existe uma regra quebrada para o campo no array de erros
+					if (!array_key_exists($field, $this->validationErrors)){
+						$this->setError($field, $rule['message']);
+					}else{
+						break;
+					}
 				}
 			}
 		}
-
-		return true;
+		return $this->validationErrors ? false : true;
 	}
 
-	public function setError($errorMessage){
-		$this->error = $errorMessage;
+	public function setError($field, $errorMessage){
+		$this->validationErrors[$field][] = $errorMessage;
 	}
 
-	public function getError(){
-		return $this->error;
+	public function getValidationErrors(){
+		return $this->validationErrors;
 	}
 
 	/**
@@ -76,7 +83,7 @@ class Validator {
 	public function paymentTypeIssuer($check, $params, $data) {
 		if($check === 'debito') {
 			$validIssuersForDebit = array('master', 'visa');
-			if(!$this->inList($data['issuer'], $validIssuersForDebit)) {
+			if(!array_key_exists('issuer', $data) or !$this->inList($data['issuer'], $validIssuersForDebit)) {
 				return false;
 			}
 		}

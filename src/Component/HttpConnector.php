@@ -1,7 +1,6 @@
 <?php
 
- // require_once 'src/Constants.php';
-require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Constants.php');
+namespace PayComponent\Component;
 
 class HttpConnector {
 
@@ -38,7 +37,7 @@ class HttpConnector {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_CONNECTTIMEOUT => TIMEOUT,
+            CURLOPT_TIMEOUT => TIMEOUT, // Em segundos
         ); 
         $options = ($options + $methodOptions);
         
@@ -51,7 +50,7 @@ class HttpConnector {
         curl_close($curl);
 
         if ($error) {
-            $this->error = $error;
+            $this->error = array('code' => $error, 'message' => $errorMessage);
             return false;
         }
 
@@ -62,8 +61,14 @@ class HttpConnector {
     }
 
     public function requestSucceded() {
-        return in_array($this->status, [200, 201, 202]);
+        return in_array($this->status, array(200, 201, 202));
     }
+
+    public function isPayValidationError(){
+        return $this->status == STATUS_CODE_PAY_VALIDATION_ERROR;
+    }
+
+    // Validar 429 = validation error 
 
     public function setMethod($method){
         $this->method = $method;

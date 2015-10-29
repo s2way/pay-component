@@ -4,9 +4,6 @@
   "description": "S2Way PaymentComponent",
   "author": "Newborns Team",
   "license": "Private",
-  "dependencies": {
-    "moment": "^2.10.6"
-  },
   "devDependencies": {
     "blanket": "git://github.com/alex-seville/blanket.git",
     "coffeelint": "^1.9.4",

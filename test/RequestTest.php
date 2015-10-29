@@ -1,7 +1,9 @@
 <?php
 
-require_once 'src/Requester.php';
-require_once 'src/PaymentCard.php';
+use PayComponent\Requester;
+use PayComponent\PaymentCard;
+use PayComponent\PaymentToken;
+use PayComponent\Component\HttpConnector;
 
 class RequestTest extends PHPUnit_Framework_TestCase {
 
@@ -50,7 +52,7 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodCreationError(){
         $expectedError = 'some error';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getError'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getError', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
         $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
 
@@ -64,14 +66,14 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodCreationSuccess(){
         $expectedData = '"123456789abcdefg"';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(200);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedData);
 
         $requester = new Requester($mockedHttpConnector);
 
-        $mockedPaymentCard = $this->getMockBuilder('PaymentCard')->setMethods(array('setId'))->getMock();
+        $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('setId'))->getMock();
         $mockedPaymentCard->expects($this->any())->method('setId')->will($this->returnCallback(function($id){
             $this->assertEquals($expectedData, $id);
         }));
@@ -88,10 +90,10 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $expectedError = 'some error';
         $expectedURL = "{$baseURL}/orders/{$orderId}";
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getError', 'setURL'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getError', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
         $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
-        $mockedHttpConnector->expects($this->any())->method('setURL')->will($this->returnCallback(function($url) use ($expectedURL) {
+        $mockedHttpConnector->expects($this->any())->method('setUrl')->will($this->returnCallback(function($url) use ($expectedURL) {
             $this->assertEquals($expectedURL, $url);
         }));
 
@@ -107,7 +109,7 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodProcessSuccess() {
         $expectedResponse = '{"authentication_url": "http://somerul.com", "token" : "token1"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
@@ -124,7 +126,7 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodProcessSuccessWithoutAuthURL() {
         $expectedResponse = '{"return_url": "http://somerul.com", "token" : "token1"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
@@ -141,7 +143,7 @@ class RequestTest extends PHPUnit_Framework_TestCase {
     public function testMethodProcessSuccessWithPurchaseByToken() {
         $expectedResponse = '{"return_url": "http://somerul.com"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);

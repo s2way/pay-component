@@ -1,10 +1,11 @@
 <?php
 
-require_once 'src/Payment.php';
+namespace PayComponent;
+
+use PayComponent\Payment; 
 
 class PaymentToken extends Payment {
 
-    private $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url');
     private $processFields = array('issuer', 'payment_type','installments','auth_token', 'token');
 
     public function getCreationData() {

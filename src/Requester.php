@@ -1,7 +1,7 @@
 <?php
 
-// require_once 'Component/HttpConnector.php';
-require_once(APP . 'Vendor' . DS . 'PayComponent' . DS .  'src' . DS . 'Component' . DS .  'HttpConnector.php');
+namespace PayComponent;
+use PayComponent\Component\HttpConnector;
 
 class Requester {
 
@@ -28,7 +28,12 @@ class Requester {
 		$response = json_decode($this->httpConnector->getResponse());
 		if ($this->httpConnector->requestSucceded()) {
 			$this->getPayment()->setId($response);
-		} else {
+		}else if ($this->httpConnector->isPayValidationError()){
+			// TODO: Verificar o que fazer
+			$this->error = $response;
+			return false;
+		}else{
+			// Retorna o erro em formato de objeto
 			$this->error = $response;
 			return false;
 		}
@@ -50,7 +55,10 @@ class Requester {
 		if ($this->httpConnector->requestSucceded()) {
 			// Atualiza o objeto pagamento
 			$this->updatePayment($response);
-		} else {
+		}else if ($this->httpConnector->isPayValidationError()){
+			die(var_dump($response));
+			// Varrer lista de erros e adicionar em um array do formato das validações do component
+		}else{
 			// Retorna o erro em formato de objeto
 			$this->error = $response;
 			return false;
@@ -83,10 +91,8 @@ class Requester {
 			$this->error = $this->httpConnector->getError();
 			return false;
 		}
-
 		return true;
 	}
-
 
 	public function setBaseURL($url) {
 		$this->baseURL = $url;

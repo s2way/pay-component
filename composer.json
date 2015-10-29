@@ -1,0 +1,17 @@
+{
+    "name": "s2way/pay_component",
+    "description": "Component for integration with de Pay Gateway",
+    "authors": [
+        {
+            "name": "Newborns",
+            "email": "newborns@versul.com.br"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "PayComponent\\": "src/"
+        }
+    }
+}

@@ -1,9 +1,11 @@
 <?php
 
-require_once 'src/PaymentCard.php';
-require_once 'src/Component/Validator.php';
+use PayComponent\PaymentCard;
+use PayComponent\Component\Validator;
 
 class PaymentCardTest extends PHPUnit_Framework_TestCase {
+
+    private $field = null;
 
     public function setUp() {
         $this->data = array(
@@ -42,24 +44,22 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $pay->getId());
     }
 
-    /**
-      * @expectedException InvalidArgumentException
-      * @expectedExceptionMessage some error
-    */
-    public function testValidateException() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
+    public function testValidateErrors() {
+        $validator = $this->getMockBuilder('PayComponent\Component\Validator')->setMethods(array('validate', 'getValidationErrors'))->getMock();
         $validator->expects($this->any())->method('validate')->willReturn(false);
-        $validator->expects($this->any())->method('getError')->willReturn('some error');
+        $validator->expects($this->any())->method('getValidationErrors')->willReturn('some error');
         $pay = new PaymentCard($validator);
-        $pay->validate();
+        $this->assertFalse($pay->validate());
+        $this->assertEquals('some error', $pay->getErrors());
     }
 
     public function testValidatePassed() {
-        $validator = $this->getMockBuilder('Validator')->setMethods(array('validate', 'getError'))->getMock();
+        $validator = $this->getMockBuilder('PayComponent\Component\Validator')->setMethods(array('validate', 'getValidationErrors'))->getMock();
         $validator->expects($this->any())->method('validate')->willReturn(true);
         $pay = new PaymentCard($validator);
-        $pay->validate();
-        $this->assertEmpty($validator->getError());
+        $this->assertTrue($pay->validate());
+        $this->assertNull($pay->getErrors());
+        $this->assertEmpty($validator->getValidationErrors());
     }
 
     /**
@@ -67,365 +67,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
      ***** TESTS CLASS METHODS *****
      *******************************
      */
-
-
-
-
-    /**
-      * @expectedException InvalidArgumentException
-      * @expectedExceptionMessage Invalid auth_token.
-    */
-    public function testAuthTokenNotEmpty() {
-        $pay = new PaymentCard();
-        
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    public function testDescriptionNotEmpty() {$this->validateNotEmpty('description');}
-
-    public function testAmountNotEmpty() {$this->validateNotEmpty('amount');}
-
-    public function testReturnURLNotEmpty() {$this->validateNotEmpty('return_url');}
-
-    public function testIssuerNotEmpty() {$this->validateNotEmpty('issuer');}
-
-    public function testCardNumberNotEmpty() {$this->validateNotEmpty('card_number');}
-
-    public function testDueDateNotEmpty() {$this->validateNotEmpty('due_date');}
-
-    public function testSecCodeStatusNotEmpty() {$this->validateNotEmpty('sec_code_status');}
-
-    public function testCardHolderNotEmpty() {$this->validateNotEmpty('card_holder');}
-
-    public function testPaymentTypeNotEmpty() {$this->validateNotEmpty('payment_type');}
-
-    public function testInstallmentsNotEmpty() {$this->validateNotEmpty('installments');}
-
-
-    /**
-     * @expectedExceptionMessage Description is too long.
-     * @expectedException InvalidArgumentException
-     */
-    public function testDescriptionMaxLength() {
-        $pay = new PaymentCard();
-
-        $this->data['description'] = implode(array_fill(0, 1025, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The amount should be in cents.
-     */
-    public function testAmoutNaturalNumberWithDot() {
-        $pay = new PaymentCard();
-
-        $this->data['amount'] = 2.33;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The amount should be in cents.
-     */
-    public function testAmoutNaturalNumberWithComma() {
-        $pay = new PaymentCard();
-
-        $this->data['amount'] = '2,33';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Amount must be positive.
-     */
-    public function testAmoutNaturalNumberNegative() {
-        $pay = new PaymentCard();
-
-        $this->data['amount'] = -2.33;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Amount is too long.
-     */
-    public function testAmoutTooLong() {
-        $pay = new PaymentCard();
-
-        $this->data['amount'] = implode(array_fill(0, 13, '1'));;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Return URL is too long.
-     */
-    public function testReturnURLTooLong() {
-        $pay = new PaymentCard();
-
-        $this->data['return_url'] = implode(array_fill(0, 2049, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid return_url.
-     */
-    public function testReturnURLInvalid() {
-        $pay = new PaymentCard();
-
-        $this->data['return_url'] = 'https://www.google.';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    public function testReturnURLWithSubdomain() {
-        $pay = new PaymentCard();
-
-        $this->data['return_url'] = 'http://desenv.localhost:8080/cliente';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unknown issuer.
-     */
-    public function testUnknownIssuer() {
-        $pay = new PaymentCard();
-
-        $this->data['issuer'] = 'other issuer';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage card_number is too long.
-     */
-    public function testCardNumberTooLong() {
-        $pay = new PaymentCard();
-
-        $this->data['card_number'] = implode(array_fill(0, 20, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid card_number.
-     */
-    public function testInvalidCardNumber() {
-        $pay = new PaymentCard();
-
-        $this->data['card_number'] = 'invalid card number';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid due_date length.
-    */
-    public function testInvalidDueDateLength() {
-        $pay = new PaymentCard();
-
-        $this->data['due_date'] = 123;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage due_date must be numeric.
-    */
-    public function testDueDateNumeric() {
-        $pay = new PaymentCard();
-
-        $this->data['due_date'] = '1o2015';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage sec_code_status is invalid.
-    */
-    public function testInvalidSecCodeStatus() {
-        $pay = new PaymentCard();
-
-        $this->data['sec_code_status'] = '999';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid security_code length.
-    */
-    public function testSecurityCodeLength() {
-        $pay = new PaymentCard();
-
-        $this->data['security_code'] = 123456;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid security_code.
-    */
-    public function testInvalidSecurityCode() {
-        $pay = new PaymentCard();
-
-        $this->data['sec_code_status'] = 1;
-        $this->data['security_code'] = '';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage security_code must be numeric.
-    */
-    public function testSecurityCodeNumeric() {
-        $pay = new PaymentCard();
-
-        $this->data['security_code'] = 'aaa';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage card_holder is too long
-    */
-    public function testCardHolderTooLong() {
-        $pay = new PaymentCard();
-
-        $this->data['card_holder'] = implode(array_fill(0, 51, 'm'));
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unknown payment_type.
-    */
-    public function testUnknownPaymentType() {
-        $pay = new PaymentCard();
-
-        $this->data['payment_type'] = 'Unknown_payment_type';
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid issuer for this payment type.
-    */
-    public function testPaymentTypeInvalidIssuer() {
-        $pay = new PaymentCard();
-
-        $this->data['payment_type'] = 'debito';
-        $this->data['issuer'] = 'amex';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid installments for this payment_type.
-    */
-    public function testInstallmentsTooLong() {
-        $pay = new PaymentCard();
-
-        $this->data['installments'] = 9;
-        $this->data['payment_type'] = 'credito_parcelado_loja';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The payment type allows only 1 installment.
-    */
-    public function testInstallmentsPaymentType() {
-        $pay = new PaymentCard();
-
-        $this->data['installments'] = 2;
-        $this->data['payment_type'] = 'debito';
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        $pay->validate();
-    }
-
-    private function validateNotEmpty($field) {
-        $pay = new PaymentCard();
-
-        $this->data[$field] = null;
-
-        $pay->setAuthToken('any');
-        $pay->setData($this->data);
-        
-        try {
-            $pay->validate();
-            $this->fail();
-        } catch (Exception $e) {
-            $this->assertEquals("Invalid $field.", $e->getMessage());
-            $this->assertEquals('InvalidArgumentException', get_class($e));
-        }
-    }
 
     public function testCreationData() {
         $this->data['auth_token'] = 'any';
@@ -462,6 +103,243 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $pay->setAuthToken($this->data['auth_token']);
         $pay->setData($this->data);
         $this->assertEquals($expectedData, $pay->getProcessData());
+    }
+
+    public function testAuthTokenNotEmpty() {
+
+        $expectedError = array(
+            'auth_token' => array('Invalid auth_token.')
+        );
+
+        $pay = new PaymentCard();
+        $pay->setData($this->data);
+        $this->assertFalse($pay->validate());
+        $this->assertEquals($expectedError, $pay->getErrors());
+    }
+
+    public function testDescriptionNotEmpty() {$this->validateFields('description');}
+
+    public function testAmountNotEmpty() {$this->validateFields('amount');}
+
+    public function testReturnURLNotEmpty() {$this->validateFields('return_url');}
+
+    public function testIssuerNotEmpty() {
+
+        $expectedError = array(
+            'issuer' => array('Invalid issuer.'),
+            'payment_type' => array('Invalid issuer for this payment type.')
+        );
+
+        $this->validateFields('issuer', $expectedError);
+    }
+
+    public function testCardNumberNotEmpty() {$this->validateFields('card_number');}
+
+    public function testDueDateNotEmpty() {$this->validateFields('due_date');}
+
+    public function testSecCodeStatusNotEmpty() {$this->validateFields('sec_code_status');}
+
+    public function testCardHolderNotEmpty() {$this->validateFields('card_holder');}
+
+    public function testPaymentTypeNotEmpty() {$this->validateFields('payment_type');}
+
+    public function testInstallmentsNotEmpty() {$this->validateFields('installments');}
+
+    public function testDescriptionMaxLength() {
+        $this->field = 'description';
+        $expectedError = array($this->field => array('Description is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 1025, 'm'));
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testAmoutNaturalNumberWithDot() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $this->data[$this->field] = 2.33;
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testAmoutNaturalNumberWithComma() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $this->data[$this->field] = '2,33';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testAmoutNaturalNumberNegative() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount must be positive.'));
+        $this->data[$this->field] = -2.33;
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testAmoutStringNaturalNumberNegative() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount must be positive.'));
+        $this->data[$this->field] = '-2,33';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testAmoutTooLong() {
+        $this->field = 'amount';
+        $expectedError = array($this->field => array('Amount is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testReturnURLTooLong() {
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Return URL is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 2049, 'm'));
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testReturnURLInvalid() {
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Invalid return_url.'));
+        $this->data[$this->field] = 'https://www.google.';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testReturnURLWithSubdomain() {
+        $this->field = 'return_url';
+        $expectedError = array($this->field => array('Invalid return_url.'));
+        $this->data[$this->field] = 'http://desenv.localhost:a156156/cliente';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testUnknownIssuer() {
+        $this->field = 'issuer';
+        $expectedError = array(
+            $this->field => array('Unknown issuer.'),
+            'payment_type' => array('Invalid issuer for this payment type.')
+        );
+        $this->data[$this->field] = 'other issuer';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testCardNumberTooLong() {
+        $this->field = 'card_number';
+        $expectedError = array($this->field => array('card_number is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 20, 'm'));
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInvalidCardNumber() {
+        $this->field = 'card_number';
+        $expectedError = array($this->field => array('Invalid card_number.'));
+        $this->data[$this->field] = 'invalid card number';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInvalidDueDateLength() {
+        $this->field = 'due_date';
+        $expectedError = array($this->field => array('Invalid due_date length.'));
+        $this->data[$this->field] = 123;
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testDueDateNumeric() {
+        $this->field = 'due_date';
+        $expectedError = array($this->field => array('due_date must be numeric.'));
+        $this->data[$this->field] = '1o2015';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInvalidSecCodeStatus() {
+        $this->field = 'sec_code_status';
+        $expectedError = array($this->field => array('sec_code_status is invalid.'));
+        $this->data[$this->field] = '999';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testSecurityCodeLength() {
+        $this->field = 'security_code';
+        $expectedError = array($this->field => array('Invalid security_code length.'));
+        $this->data[$this->field] = 123456;
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInvalidSecurityCode() {
+        $this->field = 'security_code';
+        $expectedError = array($this->field => array('Invalid security_code.'));
+        $this->data['sec_code_status'] = 1;
+        $this->data[$this->field] = '';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testSecurityCodeNumeric() {
+        $this->field = 'security_code';
+        $expectedError = array($this->field => array('security_code must be numeric.'));
+        $this->data[$this->field] = 'aaa';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testCardHolderTooLong() {
+        $this->field = 'card_holder';
+        $expectedError = array($this->field => array('card_holder is too long.'));
+        $this->data[$this->field] = implode(array_fill(0, 51, 'm'));
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testUnknownPaymentType() {
+        $this->field = 'payment_type';
+        $expectedError = array($this->field => array('Unknown payment_type.'));
+        $this->data[$this->field] = 'Unknown_payment_type';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testPaymentTypeInvalidIssuer() {
+        $this->field = 'payment_type';
+        $expectedError = array($this->field => array('Invalid issuer for this payment type.'));
+        $this->data[$this->field] = 'debito';
+        $this->data['issuer'] = 'amex';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInstallmentsTooLong() {
+        $this->field = 'installments';
+        $expectedError = array($this->field => array('Invalid installments for this payment_type.'));
+        $this->data[$this->field] = 9;
+        $this->data['payment_type'] = 'credito_parcelado_loja';
+        $this->validateFields(null, $expectedError);
+    }
+
+    public function testInstallmentsPaymentType() {
+        $this->field = 'installments';
+        $expectedError = array($this->field => array('The payment type allows only 1 installment.'));
+        $this->data[$this->field] = 2;
+        $this->data['payment_type'] = 'debito';
+        $this->validateFields(null, $expectedError);
+    }
+
+  
+
+    /**
+     * Método auxiliar na validação dos campos
+     * $field = Caso recebido, indica teste de emptyFields
+     * $expectedError = Utilizado quando um campo influencia em validações de outro campo. 
+     *  Ex: Issuer, que influencia no teste do campo 'payment_type'
+     */
+    private function validateFields($field = null, $expectedError = null) {
+
+        // Caso for uma validação de emptyFields, utiliza mensagem padrão de erros
+        if ($expectedError == null) {
+            $expectedError = array(
+                "$field" => array("Invalid $field.")
+            );
+        }
+        // Caso campo for passado de parâmetro, indica teste emptyField
+        if ($field != null){
+            $this->data[$field] = null;
+        }
+
+        $pay = new PaymentCard();
+        $pay->setAuthToken('any');
+        $pay->setData($this->data);
+
+        $this->assertFalse($pay->validate());
+        $this->assertEquals($expectedError, $pay->getErrors());
     }
 
 }// End Class
