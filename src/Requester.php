@@ -55,9 +55,6 @@ class Requester {
 		if ($this->httpConnector->requestSucceded()) {
 			// Atualiza o objeto pagamento
 			$this->updatePayment($response);
-		}else if ($this->httpConnector->isPayValidationError()){
-			die(var_dump($response));
-			// Varrer lista de erros e adicionar em um array do formato das validações do component
 		}else{
 			// Retorna o erro em formato de objeto
 			$this->error = $response;
