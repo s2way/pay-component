@@ -7,7 +7,7 @@
             "email": "newborns@versul.com.br"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {},
     "autoload": {
         "psr-4": {
