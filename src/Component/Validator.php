@@ -82,7 +82,7 @@ class Validator {
 	 */
 	public function paymentTypeIssuer($check, $params, $data) {
 		if($check === 'debito') {
-			$validIssuersForDebit = array('master', 'visa');
+			$validIssuersForDebit = array('mastercard', 'visa');
 			if(!array_key_exists('issuer', $data) or !$this->inList($data['issuer'], $validIssuersForDebit)) {
 				return false;
 			}
