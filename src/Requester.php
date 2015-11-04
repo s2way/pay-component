@@ -25,7 +25,7 @@ class Requester {
 		if (!$this->sendRequest($this->getPayment()->getCreationData())) {
 			return false;
 		}
-		$response = json_decode($this->httpConnector->getResponse());
+		$response = json_decode($this->httpConnector->getResponse(), true);
 		if ($this->httpConnector->requestSucceded()) {
 			$this->getPayment()->setId($response);
 		}else if ($this->httpConnector->isPayValidationError()){
@@ -58,7 +58,7 @@ class Requester {
 			return false;
 		}
 		// Decodifica a resposta
-		$response = json_decode($this->httpConnector->getResponse());
+		$response = json_decode($this->httpConnector->getResponse(), true);
 		// Se houve sucesso
 		if ($this->httpConnector->requestSucceded()) {
 			// Atualiza o objeto pagamento
@@ -76,15 +76,15 @@ class Requester {
 		if ($this->getPayment() instanceof PaymentCard) {
 			// Testa se a resposta contém uma url de autenticação; isto é importante porque, caso 
 			// a forma de autorização pule a etapa de autenticação, somente a return_url é recebida
-			if (property_exists($response, 'authentication_url')) {
-				$this->getPayment()->setReturnURL($response->authentication_url);
+			if (array_key_exists('authentication_url', $response)) {
+				$this->getPayment()->setReturnURL($response['authentication_url']);
 			} else {
-				$this->getPayment()->setReturnURL($response->return_url);
+				$this->getPayment()->setReturnURL($response['return_url']);
 			}
 			// Adiciona o token do cartão à resposta
-			$this->getPayment()->setToken($response->token);
+			$this->getPayment()->setToken($response['token']);
 		} else { // Se for pagamento por token
-			$this->getPayment()->setReturnURL($response->return_url);
+			$this->getPayment()->setReturnURL($response['return_url']);
 		}
 	}
 
