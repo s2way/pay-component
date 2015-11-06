@@ -4,26 +4,26 @@ use PayComponent\Component\Validator;
 
 class ValidatorTest extends PHPUnit_Framework_TestCase {
 
-    // public function testErrorWithOneFieldOneRule() {
+    public function testErrorWithOneFieldOneRule() {
 
-    // 	$data['description'] = '';
+    	$data['description'] = '';
 
-    // 	$expectedError = array(
-    //         'description' => array('Invalid descripion.')
-    //     );
+    	$expectedError = array(
+            'description' => 'Invalid descripion.'
+        );
 
-    // 	$rule = array(
-    // 		'description' => array(
-	   //  		'notEmpty' => array(
-	   //  			'message' => 'Invalid descripion.'
-	   //  		)
-    // 		)
-    // 	);
+    	$rule = array(
+    		'description' => array(
+	    		'notEmpty' => array(
+	    			'message' => 'Invalid descripion.'
+	    		)
+    		)
+    	);
 
-    // 	$validator = new Validator();
-    // 	$validator->validate($rule, $data);
-    // 	$this->assertEquals($expectedError, $validator->getValidationErrors());
-    // }
+    	$validator = new Validator();
+    	$validator->validate($rule, $data);
+    	$this->assertEquals($expectedError, $validator->getValidationErrors());
+    }
 
     /**
      * No caso dos campos com duas regras, deverá retornar apenas a primeira regra deste campo.
@@ -31,12 +31,6 @@ class ValidatorTest extends PHPUnit_Framework_TestCase {
     public function testErrorWithOneFieldTwoRules() {
 
         $data['due_date'] = 'a1b2c3d4e5e6';
-
-        $expectedError = array(
-            'due_date' => array(
-                'Invalid due_date length.'
-            )
-        );
 
         $rule = array(
             'due_date' => array(
@@ -48,6 +42,10 @@ class ValidatorTest extends PHPUnit_Framework_TestCase {
                     'message' => 'due_date must be numeric.'
                 )
             )
+        );
+
+        $expectedError = array(
+            'due_date' => 'Invalid due_date length.'
         );
 
         $validator = new Validator();
@@ -74,8 +72,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase {
         );
 
         $expectedError = array(
-            'description' => array('Invalid description.'),
-            'issuer' => array('Invalid issuer.')
+            'description' => 'Invalid description.',
+            'issuer' => 'Invalid issuer.'
         );
 
         $validator = new Validator();
@@ -110,12 +108,8 @@ class ValidatorTest extends PHPUnit_Framework_TestCase {
         );
 
         $expectedError = array(
-            'due_date' => array(
-                'Invalid due_date length.',
-            ),
-            'card_number' => array(
-                'card_number is too long.',
-            )
+            'due_date' => 'Invalid due_date length.',
+            'card_number' => 'card_number is too long.'
         );
 
         $validator = new Validator();

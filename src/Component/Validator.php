@@ -29,7 +29,7 @@ class Validator {
 	}
 
 	public function setError($field, $errorMessage){
-		$this->validationErrors[$field][] = $errorMessage;
+		$this->validationErrors[$field] = $errorMessage;
 	}
 
 	public function getValidationErrors(){

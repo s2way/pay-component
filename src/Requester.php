@@ -47,14 +47,7 @@ class Requester {
 		$this->method = METHOD_POST;
 		$this->URL = "{$this->baseURL}/orders/{$this->getPayment()->getId()}";
 
-		// TODO:  REMOVER ESSAS LINHAS ABAIXO. FEITO POIS CIELO ESTÁ RETORNANDO STATUS PROCESSING QUANDO TALVEZ PRECISE DE AUTENTICAÇÃO.
-		// $processData = $this->getPayment()->getProcessData();
-		// $processData['no_authentication'] = true;
-
-		// if (!$this->sendRequest($processData)) {
-
 		if (!$this->sendRequest($this->getPayment()->getProcessData())) {
-
 			return false;
 		}
 		// Decodifica a resposta

@@ -108,7 +108,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testAuthTokenNotEmpty() {
 
         $expectedError = array(
-            'auth_token' => array('Invalid auth_token.')
+            'auth_token' => 'Invalid auth_token.'
         );
 
         $pay = new PaymentCard();
@@ -126,8 +126,8 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testIssuerNotEmpty() {
 
         $expectedError = array(
-            'issuer' => array('Invalid issuer.'),
-            'payment_type' => array('Invalid issuer for this payment type.')
+            'issuer' => 'Invalid issuer.',
+            'payment_type' => 'Invalid issuer for this payment type.'
         );
 
         $this->validateFields('issuer', $expectedError);
@@ -147,63 +147,63 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     public function testDescriptionMaxLength() {
         $this->field = 'description';
-        $expectedError = array($this->field => array('Description is too long.'));
+        $expectedError = array($this->field => 'Description is too long.');
         $this->data[$this->field] = implode(array_fill(0, 1025, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberWithDot() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $expectedError = array($this->field => 'The amount should be in cents.');
         $this->data[$this->field] = 2.33;
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberWithComma() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $expectedError = array($this->field => 'The amount should be in cents.');
         $this->data[$this->field] = '2,33';
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberNegative() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount must be positive.'));
+        $expectedError = array($this->field => 'Amount must be positive.');
         $this->data[$this->field] = -2.33;
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutStringNaturalNumberNegative() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount must be positive.'));
+        $expectedError = array($this->field => 'Amount must be positive.');
         $this->data[$this->field] = '-2,33';
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutTooLong() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount is too long.'));
+        $expectedError = array($this->field => 'Amount is too long.');
         $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLTooLong() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Return URL is too long.'));
+        $expectedError = array($this->field => 'Return URL is too long.');
         $this->data[$this->field] = implode(array_fill(0, 2049, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLInvalid() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Invalid return_url.'));
+        $expectedError = array($this->field => 'Invalid return_url.');
         $this->data[$this->field] = 'https://www.google.';
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLWithSubdomain() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Invalid return_url.'));
+        $expectedError = array($this->field => 'Invalid return_url.');
         $this->data[$this->field] = 'http://desenv.localhost:a156156/cliente';
         $this->validateFields(null, $expectedError);
     }
@@ -211,8 +211,8 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testUnknownIssuer() {
         $this->field = 'issuer';
         $expectedError = array(
-            $this->field => array('Unknown issuer.'),
-            'payment_type' => array('Invalid issuer for this payment type.')
+            $this->field => 'Unknown issuer.',
+            'payment_type' => 'Invalid issuer for this payment type.'
         );
         $this->data[$this->field] = 'other issuer';
         $this->validateFields(null, $expectedError);
@@ -220,49 +220,49 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     public function testCardNumberTooLong() {
         $this->field = 'card_number';
-        $expectedError = array($this->field => array('card_number is too long.'));
+        $expectedError = array($this->field => 'card_number is too long.');
         $this->data[$this->field] = implode(array_fill(0, 20, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testInvalidCardNumber() {
         $this->field = 'card_number';
-        $expectedError = array($this->field => array('Invalid card_number.'));
+        $expectedError = array($this->field => 'Invalid card_number.');
         $this->data[$this->field] = 'invalid card number';
         $this->validateFields(null, $expectedError);
     }
 
     public function testInvalidDueDateLength() {
         $this->field = 'due_date';
-        $expectedError = array($this->field => array('Invalid due_date length.'));
+        $expectedError = array($this->field => 'Invalid due_date length.');
         $this->data[$this->field] = 123;
         $this->validateFields(null, $expectedError);
     }
 
     public function testDueDateNumeric() {
         $this->field = 'due_date';
-        $expectedError = array($this->field => array('due_date must be numeric.'));
+        $expectedError = array($this->field => 'due_date must be numeric.');
         $this->data[$this->field] = '1o2015';
         $this->validateFields(null, $expectedError);
     }
 
     public function testInvalidSecCodeStatus() {
         $this->field = 'sec_code_status';
-        $expectedError = array($this->field => array('sec_code_status is invalid.'));
+        $expectedError = array($this->field => 'sec_code_status is invalid.');
         $this->data[$this->field] = '999';
         $this->validateFields(null, $expectedError);
     }
 
     public function testSecurityCodeLength() {
         $this->field = 'security_code';
-        $expectedError = array($this->field => array('Invalid security_code length.'));
+        $expectedError = array($this->field => 'Invalid security_code length.');
         $this->data[$this->field] = 123456;
         $this->validateFields(null, $expectedError);
     }
 
     public function testInvalidSecurityCode() {
         $this->field = 'security_code';
-        $expectedError = array($this->field => array('Invalid security_code.'));
+        $expectedError = array($this->field => 'Invalid security_code.');
         $this->data['sec_code_status'] = 1;
         $this->data[$this->field] = '';
         $this->validateFields(null, $expectedError);
@@ -270,28 +270,28 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     public function testSecurityCodeNumeric() {
         $this->field = 'security_code';
-        $expectedError = array($this->field => array('security_code must be numeric.'));
+        $expectedError = array($this->field => 'security_code must be numeric.');
         $this->data[$this->field] = 'aaa';
         $this->validateFields(null, $expectedError);
     }
 
     public function testCardHolderTooLong() {
         $this->field = 'card_holder';
-        $expectedError = array($this->field => array('card_holder is too long.'));
+        $expectedError = array($this->field => 'card_holder is too long.');
         $this->data[$this->field] = implode(array_fill(0, 51, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testUnknownPaymentType() {
         $this->field = 'payment_type';
-        $expectedError = array($this->field => array('Unknown payment_type.'));
+        $expectedError = array($this->field => 'Unknown payment_type.');
         $this->data[$this->field] = 'Unknown_payment_type';
         $this->validateFields(null, $expectedError);
     }
 
     public function testPaymentTypeInvalidIssuer() {
         $this->field = 'payment_type';
-        $expectedError = array($this->field => array('Invalid issuer for this payment type.'));
+        $expectedError = array($this->field => 'Invalid issuer for this payment type.');
         $this->data[$this->field] = 'debito';
         $this->data['issuer'] = 'amex';
         $this->validateFields(null, $expectedError);
@@ -299,7 +299,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     public function testInstallmentsTooLong() {
         $this->field = 'installments';
-        $expectedError = array($this->field => array('Invalid installments for this payment_type.'));
+        $expectedError = array($this->field => 'Invalid installments for this payment_type.');
         $this->data[$this->field] = 9;
         $this->data['payment_type'] = 'credito_parcelado_loja';
         $this->validateFields(null, $expectedError);
@@ -307,7 +307,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
 
     public function testInstallmentsPaymentType() {
         $this->field = 'installments';
-        $expectedError = array($this->field => array('The payment type allows only 1 installment.'));
+        $expectedError = array($this->field => 'The payment type allows only 1 installment.');
         $this->data[$this->field] = 2;
         $this->data['payment_type'] = 'debito';
         $this->validateFields(null, $expectedError);
@@ -326,7 +326,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         // Caso for uma validação de emptyFields, utiliza mensagem padrão de erros
         if ($expectedError == null) {
             $expectedError = array(
-                "$field" => array("Invalid $field.")
+                "$field" => "Invalid $field."
             );
         }
         // Caso campo for passado de parâmetro, indica teste emptyField

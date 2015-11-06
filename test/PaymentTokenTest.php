@@ -100,7 +100,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
     public function testAuthTokenNotEmpty() {
 
         $expectedError = array(
-            'auth_token' => array('Invalid auth_token.')
+            'auth_token' => 'Invalid auth_token.'
         );
 
         $pay = new PaymentToken();
@@ -115,15 +115,14 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
 
     public function testReturnURLNotEmpty() {$this->validateFields('return_url');}
 
-    // public function testIssuerNotEmpty() {
+    public function testIssuerNotEmpty() {
 
-    //     $expectedError = array(
-    //         'issuer' => array('Invalid issuer.'),
-    //         'payment_type' => array('Invalid issuer for this payment type.')
-    //     );
+        $expectedError = array(
+            'issuer' => 'Invalid issuer.'
+        );
 
-    //     $this->validateFields('issuer', $expectedError);
-    // }
+        $this->validateFields('issuer', $expectedError);
+    }
 
     public function testPaymentTypeNotEmpty() {$this->validateFields('payment_type');}
 
@@ -131,95 +130,77 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
 
     public function testDescriptionMaxLength() {
         $this->field = 'description';
-        $expectedError = array($this->field => array('Description is too long.'));
+        $expectedError = array($this->field => 'Description is too long.');
         $this->data[$this->field] = implode(array_fill(0, 1025, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberWithDot() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $expectedError = array($this->field => 'The amount should be in cents.');
         $this->data[$this->field] = 2.33;
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberWithComma() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('The amount should be in cents.'));
+        $expectedError = array($this->field => 'The amount should be in cents.');
         $this->data[$this->field] = '2,33';
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutNaturalNumberNegative() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount must be positive.'));
+        $expectedError = array($this->field => 'Amount must be positive.');
         $this->data[$this->field] = -2.33;
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutStringNaturalNumberNegative() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount must be positive.'));
+        $expectedError = array($this->field => 'Amount must be positive.');
         $this->data[$this->field] = '-2,33';
         $this->validateFields(null, $expectedError);
     }
 
     public function testAmoutTooLong() {
         $this->field = 'amount';
-        $expectedError = array($this->field => array('Amount is too long.'));
+        $expectedError = array($this->field => 'Amount is too long.');
         $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLTooLong() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Return URL is too long.'));
+        $expectedError = array($this->field => 'Return URL is too long.');
         $this->data[$this->field] = implode(array_fill(0, 2049, 'm'));
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLInvalid() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Invalid return_url.'));
+        $expectedError = array($this->field => 'Invalid return_url.');
         $this->data[$this->field] = 'https://www.google.';
         $this->validateFields(null, $expectedError);
     }
 
     public function testReturnURLWithSubdomain() {
         $this->field = 'return_url';
-        $expectedError = array($this->field => array('Invalid return_url.'));
+        $expectedError = array($this->field => 'Invalid return_url.');
         $this->data[$this->field] = 'http://desenv.localhost:a156156/cliente';
         $this->validateFields(null, $expectedError);
     }
 
-    // public function testUnknownIssuer() {
-    //     $this->field = 'issuer';
-    //     $expectedError = array(
-    //         $this->field => array('Unknown issuer.'),
-    //         'payment_type' => array('Invalid issuer for this payment type.')
-    //     );
-    //     $this->data[$this->field] = 'other issuer';
-    //     $this->validateFields(null, $expectedError);
-    // }
-
     public function testUnknownPaymentType() {
         $this->field = 'payment_type';
-        $expectedError = array($this->field => array('Unknown payment_type.'));
+        $expectedError = array($this->field => 'Unknown payment_type.');
         $this->data[$this->field] = 'Unknown_payment_type';
         $this->validateFields(null, $expectedError);
     }
 
-    // public function testPaymentTypeInvalidIssuer() {
-    //     $this->field = 'payment_type';
-    //     $expectedError = array($this->field => array('Invalid issuer for this payment type.'));
-    //     $this->data[$this->field] = 'debito';
-    //     $this->data['issuer'] = 'amex';
-    //     $this->validateFields(null, $expectedError);
-    // }
-
     public function testInstallmentsTooLong() {
         $this->field = 'installments';
-        $expectedError = array($this->field => array('Invalid installments for this payment_type.'));
+        $expectedError = array($this->field => 'Invalid installments for this payment_type.');
         $this->data[$this->field] = 9;
         $this->data['payment_type'] = 'credito_parcelado_loja';
         $this->validateFields(null, $expectedError);
@@ -227,7 +208,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
 
     public function testInstallmentsPaymentType() {
         $this->field = 'installments';
-        $expectedError = array($this->field => array('The payment type allows only 1 installment.'));
+        $expectedError = array($this->field => 'The payment type allows only 1 installment.');
         $this->data[$this->field] = 2;
         $this->data['payment_type'] = 'credito_a_vista';
         $this->validateFields(null, $expectedError);
@@ -244,7 +225,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
         // Caso for uma validação de emptyFields, utiliza mensagem padrão de erros
         if ($expectedError == null) {
             $expectedError = array(
-                "$field" => array("Invalid $field.")
+                "$field" => "Invalid $field."
             );
         }
         // Caso campo for passado de parâmetro, indica teste emptyField
