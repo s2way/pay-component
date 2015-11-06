@@ -73,6 +73,10 @@ class PayComponent {
         $this->noAutentication = $noAutentication;
     }
 
+    public function setPayURL($url) {
+        $this->payURL = $url;
+    }
+
     public function getError() {
         return $this->error;
     }
@@ -83,6 +87,10 @@ class PayComponent {
 
     public function getRedirectURL() {
         return $this->requester->getPayment()->getReturnURL();
+    }
+
+    public function getPayURL() {
+        return $this->payURL;
     }
 
 }
