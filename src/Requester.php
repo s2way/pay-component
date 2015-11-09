@@ -56,6 +56,15 @@ class Requester {
 		if ($this->httpConnector->requestSucceded()) {
 			// Atualiza o objeto pagamento
 			$this->updatePayment($response);
+		}else if ($this->httpConnector->isPayValidationError()){
+			// Caso for um erro de validação do pay, formata o array de validações para deixar no mesmo formato de erros do componente
+			$returnError = array();
+			$validationFieldsError = $response['fields'];
+			foreach ($validationFieldsError as $key => $value) {
+				$returnError[$key] = $value['message'];
+			}
+			$this->error = $returnError;
+			return false;
 		}else{
 			// Retorna o erro em formato de objeto
 			$this->error = $response;
