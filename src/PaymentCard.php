@@ -127,15 +127,6 @@ class PaymentCard extends Payment {
 					'message' => 'security_code must be numeric.'
 				)
 			),
-			'card_holder' => array(
-				'notEmpty' => array(
-					'message' => 'Invalid card_holder.'
-				),
-				'maxLength' => array(
-					'params' => 50,
-					'message' => 'card_holder is too long.'
-				)
-			),
 			'payment_type' => array(
 				'notEmpty' => array(
 					'message' => 'Invalid payment_type.'
