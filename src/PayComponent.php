@@ -10,7 +10,6 @@ class PayComponent {
     // Class properties
     private $payURL = null;
     private $authToken = null;
-    private $noAutentication = 0;
     private $error = null;
     // Injected properties
     private $paymentCard = null;
@@ -67,10 +66,6 @@ class PayComponent {
 
     public function setAuthToken($authToken) {
         $this->authToken = $authToken;
-    }
-
-    public function setNoAutentication($noAutentication) {
-        $this->noAutentication = $noAutentication;
     }
 
     public function setPayURL($url) {

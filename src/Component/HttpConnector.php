@@ -54,8 +54,8 @@ class HttpConnector {
             return false;
         }
 
-        $this->status = $info['http_code'];
-        $this->response = $resp;
+        $this->setStatus($info['http_code']);
+        $this->setResponse($resp);
         return true;
 
     }
@@ -80,8 +80,16 @@ class HttpConnector {
         $this->data = $data;
     }
 
+    public function setStatus($status){
+        $this->status = $status;
+    }
+
     public function getStatus(){
         return $this->status;
+    }
+
+    public function setResponse($response) {
+        $this->response = $response;
     }
 
     public function getResponse(){

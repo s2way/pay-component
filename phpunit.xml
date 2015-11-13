@@ -15,4 +15,20 @@
         <directory>test</directory>
     </testsuite>
 
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./src/</directory>
+            <exclude>
+                <directory suffix=".phtml">./src/</directory>
+                <directory suffix=".php">d./test/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="./codeCoverage" charset="UTF-8"
+            yui="true" highlight="true"
+            lowUpperBound="50" highLowerBound="95"/>
+    </logging>
+
 </phpunit>

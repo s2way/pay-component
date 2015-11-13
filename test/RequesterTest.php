@@ -5,9 +5,11 @@ use PayComponent\PaymentCard;
 use PayComponent\PaymentToken;
 use PayComponent\Component\HttpConnector;
 
-class RequestTest extends PHPUnit_Framework_TestCase {
+class RequesterTest extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
+
+        date_default_timezone_set('America/Sao_Paulo');
 
         $this->paymentCard = new PaymentCard();
         $this->paymentData = array(
@@ -49,12 +51,49 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $requester->payment);
     }
 
-    public function testMethodCreationError(){
-        $expectedError = 'some error';
+    public function testMethodCreationRequestError(){
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getError', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $expectedError = 'some request error';
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getError'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
         $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertFalse($requester->create());
+        $this->assertEquals($expectedError, $requester->getError());
+    }
+
+    public function testMethodCreationPayValidationError(){
+
+        $throwError = '{"error": "some pay error"}';
+        $expectedError = array('error' => 'some pay error');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
+        $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(true);
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertFalse($requester->create());
+        $this->assertEquals($expectedError, $requester->getError());
+    }
+
+    public function testMethodCreationOtherError(){
+
+        $throwError = '{"error": "other error"}';
+        $expectedError = array('error' => 'other error');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
+        $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(false);
 
         $requester = new Requester($mockedHttpConnector);
         $requester->setPayment($this->paymentCard);
@@ -84,7 +123,7 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertNull($requester->getError());
     }
 
-    public function testMethodProcessError() {
+    public function testMethodProcessRequestError() {
         $orderId = 'wepoijfasldkfjwope';
         $baseURL = 'http://base.url';
         $expectedError = 'some error';
@@ -100,6 +139,45 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $requester = new Requester($mockedHttpConnector);
         $requester->setBaseURL($baseURL);
         $this->paymentCard->setId($orderId);
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertFalse($requester->process());
+        $this->assertEquals($expectedError, $requester->getError());
+    }
+
+    public function testMethodProcessRequestPayValidationError() {
+
+        $throwError = '{"name": "ValidationFailed","fields": {"payment_type": {"message": "Field is invalid"},"installments": {"message": "Field is invalid"},"id": {"message": "Processing token is different from the creation token"}}}';
+        $expectedError = array('payment_type' => 'Field is invalid', 'installments' => 'Field is invalid', 'id' => 'Processing token is different from the creation token');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
+        $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(true);
+
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setBaseURL('any url');
+        $this->paymentCard->setId('any id');
+        $requester->setPayment($this->paymentCard);
+
+        $this->assertFalse($requester->process());
+        $this->assertEquals($expectedError, $requester->getError());
+    }
+
+      public function testMethodProcessRequestOtherError() {
+
+        $throwError = '{"error": "other error"}';
+        $expectedError = array('error' => 'other error');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
+        $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
+        $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(false);
+
+        $requester = new Requester($mockedHttpConnector);
+        $requester->setBaseURL('any url');
+        $this->paymentCard->setId('any id');
         $requester->setPayment($this->paymentCard);
 
         $this->assertFalse($requester->process());
@@ -159,6 +237,4 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertNull($requester->getError());
         $this->assertEquals('http://somerul.com', $payment->getReturnURL());
     }
-
-
 }

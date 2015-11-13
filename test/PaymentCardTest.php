@@ -44,6 +44,12 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $pay->getId());
     }
 
+    public function testSetNoAutentication() {
+        $pay = new PaymentCard();
+        $pay->setNoAutentication(true);
+        $this->assertTrue($pay->getNoAutentication());
+    }
+
     public function testValidateErrors() {
         $validator = $this->getMockBuilder('PayComponent\Component\Validator')->setMethods(array('validate', 'getValidationErrors'))->getMock();
         $validator->expects($this->any())->method('validate')->willReturn(false);
@@ -138,8 +144,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testDueDateNotEmpty() {$this->validateFields('due_date');}
 
     public function testSecCodeStatusNotEmpty() {$this->validateFields('sec_code_status');}
-
-    public function testCardHolderNotEmpty() {$this->validateFields('card_holder');}
 
     public function testPaymentTypeNotEmpty() {$this->validateFields('payment_type');}
 
@@ -275,13 +279,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->validateFields(null, $expectedError);
     }
 
-    public function testCardHolderTooLong() {
-        $this->field = 'card_holder';
-        $expectedError = array($this->field => 'card_holder is too long.');
-        $this->data[$this->field] = implode(array_fill(0, 51, 'm'));
-        $this->validateFields(null, $expectedError);
-    }
-
     public function testUnknownPaymentType() {
         $this->field = 'payment_type';
         $expectedError = array($this->field => 'Unknown payment_type.');
@@ -312,8 +309,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->data['payment_type'] = 'debito';
         $this->validateFields(null, $expectedError);
     }
-
-  
 
     /**
      * Método auxiliar na validação dos campos

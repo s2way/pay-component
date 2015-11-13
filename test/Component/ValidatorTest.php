@@ -25,9 +25,6 @@ class ValidatorTest extends PHPUnit_Framework_TestCase {
     	$this->assertEquals($expectedError, $validator->getValidationErrors());
     }
 
-    /**
-     * No caso dos campos com duas regras, deverá retornar apenas a primeira regra deste campo.
-     */
     public function testErrorWithOneFieldTwoRules() {
 
         $data['due_date'] = 'a1b2c3d4e5e6';

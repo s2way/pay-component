@@ -63,6 +63,7 @@ class Requester {
 			foreach ($validationFieldsError as $key => $value) {
 				$returnError[$key] = $value['message'];
 			}
+
 			$this->error = $returnError;
 			return false;
 		}else{
@@ -111,10 +112,6 @@ class Requester {
 
 	public function getPayment() {
 		return $this->payment;
-	}
-
-	public function getToken() {
-		return $this->token();
 	}
 
 	public function getError() {
