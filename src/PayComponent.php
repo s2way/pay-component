@@ -23,6 +23,7 @@ class PayComponent {
     }
 
     public function purchaseByCard($data) {
+
         $this->paymentCard->setData($data);
         $this->paymentCard->setAuthToken($this->authToken);
 
@@ -48,6 +49,7 @@ class PayComponent {
     }
 
     private function request() {
+
         $this->requester->setBaseURL($this->payURL);
         $this->requester->setPayment($this->payment);
 
@@ -77,7 +79,7 @@ class PayComponent {
     }
 
     public function getToken() {
-        return $this->requester->getPayment()->getToken();
+        return $this->requester->getPayment()->getAuthToken();
     }
 
     public function getRedirectURL() {

@@ -4,8 +4,6 @@ namespace PayComponent;
 
 use PayComponent\Component\Validator;
 
-// require 'Constants.php';
-
 abstract class Payment {
 
     private $authToken = null;

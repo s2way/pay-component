@@ -19,15 +19,15 @@ class HttpConnector {
             $contentLength = "Content-length: ".strlen($postFields);
             $methodOptions = Array(
                 CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => $postFields,
-            );          
+                CURLOPT_POSTFIELDS => $postFields
+            );
         } else {
             $contentLength = null;
             $methodOptions = Array(
                 CURLOPT_HTTPGET => true
-            );              
+            );
         }
-        
+
         $options = Array(
             CURLOPT_HTTPHEADER => Array(
                 "Content-Type: application/json",
@@ -39,8 +39,9 @@ class HttpConnector {
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => TIMEOUT, // Em segundos
         ); 
+
         $options = ($options + $methodOptions);
-        
+
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $resp = curl_exec($curl);
@@ -65,10 +66,9 @@ class HttpConnector {
     }
 
     public function isPayValidationError(){
-        return $this->status == STATUS_CODE_PAY_VALIDATION_ERROR;
+        // STATUS_CODE_PAY_VALIDATION_ERROR = 422
+        return $this->status == 422;
     }
-
-    // Validar 429 = validation error 
 
     public function setMethod($method){
         $this->method = $method;

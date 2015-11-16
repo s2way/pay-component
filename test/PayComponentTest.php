@@ -121,20 +121,6 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
         $this->assertNull($payComponent->getError());
     }
 
-    public function testGetToken(){
-        $mockedPaymentToken = $this->getMockBuilder('PayComponent\PaymentToken')->setMethods(array('validate'))->getMock();
-        $mockedPaymentToken->expects($this->any())->method('validate')->willReturn(true);
-
-        $mockedRequester = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('create', 'process'))->getMock();
-        $mockedRequester->expects($this->any())->method('create')->willReturn(true);
-        $mockedRequester->expects($this->any())->method('process')->willReturn(true);
-
-        $payComponent = new PayComponent($mockedPaymentToken, $mockedRequester);
-
-        $this->assertTrue($payComponent->purchaseByToken(array('auth_token'=>'token1')));
-        $this->assertNull($payComponent->getError());
-    }
-
     public function testSetPayUrl() {
         $expectedPayBaseUrl = 'http://192.168.122.1:1337';
         $payComponent = new PayComponent();
@@ -148,4 +134,41 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedPayBaseUrl, $payComponent->getPayURL());
     }
 
+    public function testGetToken(){
+        $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('validate'))->getMock();
+        $mockedPaymentCard->expects($this->any())->method('validate')->willReturn(true);
+
+        $mockedRequester = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('create', 'process'))->getMock();
+        $mockedRequester->expects($this->any())->method('create')->willReturn(true);
+        $mockedRequester->expects($this->any())->method('process')->willReturn(true);
+
+        $expectedToken = 'EXPECTED_TOKEN';
+
+        $payComponent = new PayComponent($mockedPaymentCard, $mockedRequester);
+        $payComponent->setAuthToken($expectedToken);
+        $payComponent->purchaseByCard(null);
+
+        $this->assertEquals($expectedToken, $payComponent->getToken());
+    }
+
+    public function testGetRedirectURL(){
+
+        $expectedRedirectURL = 'https://pay.com.br';
+
+        $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('validate', 'getReturnURL'))->getMock();
+        $mockedPaymentCard->expects($this->any())->method('validate')->willReturn(true);
+        $mockedPaymentCard->expects($this->any())->method('getReturnURL')->will($this->returnCallback(function(){
+            return 'https://pay.com.br';
+        }));
+
+        $mockedRequester = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('create', 'process'))->getMock();
+        $mockedRequester->expects($this->any())->method('create')->willReturn(true);
+        $mockedRequester->expects($this->any())->method('process')->willReturn(true);
+
+        $payComponent = new PayComponent($mockedPaymentCard, $mockedRequester);
+        $payComponent->setAuthToken('any_token');
+        $payComponent->purchaseByCard(null);
+
+        $this->assertEquals($expectedRedirectURL, $payComponent->getRedirectURL());
+    }
 }
