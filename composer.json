@@ -8,7 +8,7 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {
+    "require-dev": {
         "phpunit/php-code-coverage": "^3"
     },
     "autoload": {
