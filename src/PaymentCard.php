@@ -8,7 +8,7 @@ class PaymentCard extends Payment {
 
 	private $URL = null;
 	private $token = null;
-	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_autentication');
+	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_authentication');
 
 	public function getCreationData() {
 		return array_intersect_key($this->data, array_flip($this->creationFields));
