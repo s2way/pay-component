@@ -90,4 +90,8 @@ class PayComponent {
         return $this->payURL;
     }
 
+    public function setNoAutentication($value) {
+        $this->paymentCard->setNoAutentication($value);
+    }
+
 }
