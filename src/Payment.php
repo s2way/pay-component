@@ -7,7 +7,7 @@ use PayComponent\Component\Validator;
 abstract class Payment {
 
     private $authToken = null;
-    private $noAutentication = null;
+    private $noAuthentication = null;
     private $id = null;
     protected $data = null;
     private $errors = null;
@@ -36,12 +36,12 @@ abstract class Payment {
         return $this->authToken;
     }
 
-    public function setNoAutentication($noAutentication){
-        $this->noAutentication = $noAutentication;
+    public function setNoAuthentication($noAuthentication){
+        $this->noAuthentication = $noAuthentication;
     }
 
     public function getNoAutentication(){
-        return $this->noAutentication;
+        return $this->noAuthentication;
     }
 
     public function setId($id){
@@ -70,7 +70,7 @@ abstract class Payment {
 
     public function validate() {
         $this->data['auth_token'] = $this->authToken;
-        $this->data['no_autentication'] = $this->noAutentication;
+        $this->data['no_authentication'] = $this->noAuthentication;
 
         if (!$this->validator->validate($this->rules(), $this->data)) {
             $this->setErrors($this->validator->getValidationErrors());
