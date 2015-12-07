@@ -18,10 +18,10 @@ class Validator {
                 if (!$this->$methodName($data["$field"], $params, $data)) {
                     // Verifica se existe uma regra quebrada para o campo no array de erros
                     if (!array_key_exists($field, $this->validationErrors)){
-                        echo '======';
-                        echo $field;
-                        echo $rule['message'];
-                        echo '======';
+                        // echo '======';
+                        // echo $field;
+                        // echo $rule['message'];
+                        // echo '======';
                         $this->setError($field, $rule['message']);
                     }else{
                         break;

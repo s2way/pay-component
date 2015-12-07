@@ -22,7 +22,7 @@ class Requester {
 	public function create() {
 		$this->method = METHOD_POST;
 		$this->URL = "{$this->baseURL}/orders";
-		if (!$this->sendRequest($this->getPayment()->getCreationData())) {
+		if (!$this->sendPost($this->getPayment()->getCreationData())) {
 			return false;
 		}
 		$response = json_decode($this->httpConnector->getResponse(), true);
@@ -47,7 +47,7 @@ class Requester {
 		$this->method = METHOD_POST;
 		$this->URL = "{$this->baseURL}/orders/{$this->getPayment()->getId()}";
 
-		if (!$this->sendRequest($this->getPayment()->getProcessData())) {
+		if (!$this->sendPost($this->getPayment()->getProcessData())) {
 			return false;
 		}
 		// Decodifica a resposta
@@ -74,6 +74,40 @@ class Requester {
 		return true;
 	}
 
+	public function getStatus($id, $authToken) {
+		$this->method = METHOD_GET;
+		$this->URL = "{$this->baseURL}/orders/status/{$id}?auth_token={$authToken}";
+
+		if (!$this->sendGet()) {
+			return false;
+		}
+		// Decodifica a resposta
+		$response = json_decode($this->httpConnector->getResponse(), true);
+		// Se houve sucesso
+		if ($this->httpConnector->requestSucceded()) {
+			// Retorna o status do pagamento
+			if (isset($response[0]['status'])) {
+				return $response[0]['status'];
+			} else {
+				return false;
+			}
+		} else if ($this->httpConnector->isPayValidationError()) {
+			// Caso for um erro de validação do pay, formata o array de validações para deixar no mesmo formato de erros do componente
+			$returnError = array();
+			$validationFieldsError = $response['fields'];
+			foreach ($validationFieldsError as $key => $value) {
+				$returnError[$key] = $value['message'];
+			}
+
+			$this->error = $returnError;
+			return false;
+		} else {
+			// Retorna o erro em formato de objeto
+			$this->error = $response;
+			return false;
+		}
+	}
+
 	private function updatePayment($response) {
 		// Se for pagamento por cartão
 		if ($this->getPayment() instanceof PaymentCard) {
@@ -91,10 +125,20 @@ class Requester {
 		}
 	}
 
-	private function sendRequest($data) {
+	private function sendPost($data) {
 		$this->httpConnector->setMethod($this->method);
 		$this->httpConnector->setUrl($this->URL);
 		$this->httpConnector->setData($data);
+		if (!$this->httpConnector->send()) {
+			$this->error = $this->httpConnector->getError();
+			return false;
+		}
+		return true;
+	}
+
+	private function sendGet() {
+		$this->httpConnector->setMethod($this->method);
+		$this->httpConnector->setUrl($this->URL);
 		if (!$this->httpConnector->send()) {
 			$this->error = $this->httpConnector->getError();
 			return false;

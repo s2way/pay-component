@@ -128,12 +128,6 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedPayBaseUrl, $payComponent->getPayURL());
     }
 
-    public function testGetPayUrl() {
-        $expectedPayBaseUrl = 'http://192.168.122.1:1337';
-        $payComponent = new PayComponent();
-        $this->assertEquals($expectedPayBaseUrl, $payComponent->getPayURL());
-    }
-
     public function testGetToken(){
         $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('validate'))->getMock();
         $mockedPaymentCard->expects($this->any())->method('validate')->willReturn(true);

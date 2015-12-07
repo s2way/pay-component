@@ -30,12 +30,12 @@ class HttpConnectorTest extends PHPUnit_Framework_TestCase {
 
     public function testSendError(){
 
-        $expectedErrorCode = 6;
-        $expectedErrorMessage = 'Could not resolve host: testes';
+        $expectedErrorCode = 3;
+        $expectedErrorMessage = '<url> malformed';
 
         $connector = new HttpConnector();
         $connector->setMethod('GET');
-        $connector->setURL('http://testes');
+        $connector->setURL('/testes/bad');
         $this->assertFalse($connector->send());
 
         $this->assertEquals($expectedErrorCode, $connector->getError()['code']);

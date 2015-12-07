@@ -38,7 +38,7 @@ class HttpConnector {
             CURLOPT_HEADER => false,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => TIMEOUT, // Em segundos
-        ); 
+        );
 
         $options = ($options + $methodOptions);
 

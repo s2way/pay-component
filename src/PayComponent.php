@@ -48,6 +48,11 @@ class PayComponent {
         return $this->request();
     }
 
+    public function status($id) {
+        $this->requester->setBaseURL($this->payURL);
+        return $this->requester->getStatus($id, $this->authToken);
+    }
+
     private function request() {
 
         $this->requester->setBaseURL($this->payURL);
@@ -76,6 +81,10 @@ class PayComponent {
 
     public function getError() {
         return $this->error;
+    }
+
+    public function getStatus() {
+        return $this->requester->getPayment()->getStatus();
     }
 
     public function getToken() {
