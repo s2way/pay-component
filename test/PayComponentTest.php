@@ -129,17 +129,17 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testGetToken(){
+        $expectedToken = 'EXPECTED_TOKEN';
         $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('validate'))->getMock();
         $mockedPaymentCard->expects($this->any())->method('validate')->willReturn(true);
+        $mockedPaymentCard->setToken($expectedToken); // Token que foi retornado pela Cielo
 
         $mockedRequester = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('create', 'process'))->getMock();
-        $mockedRequester->expects($this->any())->method('create')->willReturn(true);
-        $mockedRequester->expects($this->any())->method('process')->willReturn(true);
-
-        $expectedToken = 'EXPECTED_TOKEN';
+        $mockedRequester->expects($this->atLeastOnce())->method('create')->willReturn(true);
+        $mockedRequester->expects($this->atLeastOnce())->method('process')->willReturn(true);
 
         $payComponent = new PayComponent($mockedPaymentCard, $mockedRequester);
-        $payComponent->setAuthToken($expectedToken);
+        $payComponent->setAuthToken('token_teste'); // Token utilizado pela operação no Pay
         $payComponent->purchaseByCard(null);
 
         $this->assertEquals($expectedToken, $payComponent->getToken());

@@ -185,7 +185,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testMethodProcessSuccess() {
-        $expectedResponse = '{"authentication_url": "http://somerul.com", "token" : "token1"}';
+        $expectedResponse = '{"authentication_url": "http://somerul.com", "token" : "client_token"}';
 
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
@@ -198,11 +198,11 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($requester->process());
         $this->assertNull($requester->getError());
         $this->assertEquals('http://somerul.com', $this->paymentCard->getReturnURL());
-        $this->assertEquals('token1', $this->paymentCard->getToken());
+        $this->assertEquals('client_token', $this->paymentCard->getToken());
     }
 
     public function testMethodProcessSuccessWithoutAuthURL() {
-        $expectedResponse = '{"return_url": "http://somerul.com", "token" : "token1"}';
+        $expectedResponse = '{"return_url": "http://somerul.com", "token" : "client_token"}';
 
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
@@ -215,7 +215,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($requester->process());
         $this->assertNull($requester->getError());
         $this->assertEquals('http://somerul.com', $this->paymentCard->getReturnURL());
-        $this->assertEquals('token1', $this->paymentCard->getToken());
+        $this->assertEquals('client_token', $this->paymentCard->getToken());
     }
 
     public function testMethodProcessSuccessWithPurchaseByToken() {

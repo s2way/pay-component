@@ -88,7 +88,7 @@ class PayComponent {
     }
 
     public function getToken() {
-        return $this->requester->getPayment()->getAuthToken();
+        return $this->requester->getPayment()->getToken();
     }
 
     public function getRedirectURL() {
