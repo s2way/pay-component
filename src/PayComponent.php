@@ -39,8 +39,8 @@ class PayComponent {
     public function purchaseByToken($data = null) {
         $this->paymentToken->setData($data);
         $this->paymentToken->setAuthToken($this->authToken);
-        if (!$this->paymentCard->validate()){
-            $this->error = $this->paymentCard->getErrors();
+        if (!$this->paymentToken->validate()){
+            $this->error = $this->paymentToken->getErrors();
             return false;
         }
 
