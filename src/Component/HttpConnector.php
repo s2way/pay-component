@@ -12,7 +12,9 @@ class HttpConnector {
     private $URL = null;
 
     public function send() {
-        
+
+        $authToken = $this->data['auth_token'];
+
         if ($this->method === METHOD_POST) {
             $postFields = json_encode($this->data);
 
@@ -30,9 +32,10 @@ class HttpConnector {
 
         $options = Array(
             CURLOPT_HTTPHEADER => Array(
+                "Authorization: Bearer $authToken",
                 "Content-Type: application/json",
                 $contentLength
-            ),  
+            ),
             CURLOPT_URL => $this->URL,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,

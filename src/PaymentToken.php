@@ -2,7 +2,7 @@
 
 namespace PayComponent;
 
-use PayComponent\Payment; 
+use PayComponent\Payment;
 
 class PaymentToken extends Payment {
 
@@ -17,7 +17,7 @@ class PaymentToken extends Payment {
     }
 
     public function rules() {
-        
+
         return array(
             'auth_token' => array(
                 'notEmpty' => array(
@@ -75,7 +75,7 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid payment_type.'
                 ),
                 'inList' => array(
-                    'params' => array('credito_a_vista', 'credito_parcelado_loja', 'debito'),
+                    'params' => array('credit', 'debit'),
                     'message' => 'Unknown payment_type.'
                 ),
                 'paymentTypeIssuer' => array(

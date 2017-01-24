@@ -82,7 +82,7 @@ class Validator {
     }
 
     /**
-     * Caso forma de pagamento for debito, valida apenas visa ou master 
+     * Caso forma de pagamento for debito, valida apenas visa ou master
      */
     public function paymentTypeIssuer($check, $params, $data) {
         if($check === 'debito') {

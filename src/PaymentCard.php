@@ -8,7 +8,7 @@ class PaymentCard extends Payment {
 
 	private $URL = null;
 	private $token = null;
-	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_authentication');
+	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_authentication', 'save_card');
 
 	public function getCreationData() {
 		return array_intersect_key($this->data, array_flip($this->creationFields));
@@ -75,7 +75,7 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid issuer.'
 				),
 				'inList' => array(
-					'params' => array('visa','mastercard','diners','discover','elo','amex','jcb','aura'),
+					'params' => array('visa','master','diners','discover','elo','amex','jcb','aura'),
 					'message' => 'Unknown issuer.'
 				)
 			),
@@ -95,33 +95,11 @@ class PaymentCard extends Payment {
 				'notEmpty' => array(
 					'message' => 'Invalid due_date.'
 				),
-				'equalLength' => array(
-					'params' => 6,
-					'message' => 'Invalid due_date length.'
-				),
-				'numeric' => array(
-					'message' => 'due_date must be numeric.'
-				)
-			),
-			'sec_code_status' => array(
-				'notEmpty' => array(
-					'message' => 'Invalid sec_code_status.'
-				),
-				'inList' => array(
-					'params' => array(0,1,2,9),
-					'message' => 'sec_code_status is invalid.'
-				)
 			),
 			'security_code' => array(
-				'notEmpty' => array(
-					'message' => 'Invalid security_code.'
-				),
 				'betweenLength' => array(
 					'params' => array('min' => 3, 'max' => 4),
 					'message' => 'Invalid security_code length.'
-				),
-				'securityCodeSecCodeStatus' => array(
-					'message' => 'Invalid security_code.'
 				),
 				'numeric' => array(
 					'message' => 'security_code must be numeric.'
@@ -132,7 +110,7 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid payment_type.'
 				),
 				'inList' => array(
-					'params' => array('credito_a_vista', 'credito_parcelado_loja', 'debito'),
+					'params' => array('credit', 'debit'),
 					'message' => 'Unknown payment_type.'
 				),
 				'paymentTypeIssuer' => array(
@@ -144,11 +122,11 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid installments.'
 				),
 				'installmentsPaymentType' => array(
-					'params' => array('debito', 'credito_a_vista'),
+					'params' => array('debit'),
 					'message' => 'The payment type allows only 1 installment.'
 				),
 				'installmentsMaxValue' => array(
-					'params' => 8,
+					'params' => 12,
 					'message' => 'Invalid installments for this payment_type.'
 
 				)
