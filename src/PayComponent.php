@@ -71,6 +71,10 @@ class PayComponent {
         return true;
     }
 
+    public function setRetries($retries) {
+        $this->requester->setRetries($retries);
+    }
+
     public function setAuthToken($authToken) {
         $this->authToken = $authToken;
     }

@@ -131,6 +131,10 @@ class Requester {
 		return true;
 	}
 
+	public function setRetries($retries) {
+        $this->httpConnector->setRetries = $retries;
+    }
+
 	public function setBaseURL($url) {
 		$this->baseURL = $url;
 	}
