@@ -11,7 +11,7 @@ abstract class Payment {
     private $id = null;
     protected $data = null;
     private $errors = null;
-    protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url');
+    protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url', 'client_app');
 
     /**
      * Dependency injection is ON!
