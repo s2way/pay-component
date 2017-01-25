@@ -14,7 +14,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
             'amount'  => 2500,
             'return_url' => 'http://www.google.com',
             'issuer' => 'visa',
-            'payment_type'  => 'credito_a_vista',
+            'payment_type'  => 'credit',
             'installments' => 1,
             'token' => '32165843216543213546514'
         );
@@ -166,7 +166,7 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
     public function testAmoutTooLong() {
         $this->field = 'amount';
         $expectedError = array($this->field => 'Amount is too long.');
-        $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
+        $this->data[$this->field] = implode(array_fill(0, 17, '1'));;
         $this->validateFields(null, $expectedError);
     }
 
@@ -200,24 +200,16 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
 
     public function testInstallmentsTooLong() {
         $this->field = 'installments';
-        $expectedError = array($this->field => 'Invalid installments for this payment_type.');
-        $this->data[$this->field] = 9;
-        $this->data['payment_type'] = 'credito_parcelado_loja';
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testInstallmentsPaymentType() {
-        $this->field = 'installments';
-        $expectedError = array($this->field => 'The payment type allows only 1 installment.');
-        $this->data[$this->field] = 2;
-        $this->data['payment_type'] = 'credito_a_vista';
+        $expectedError = array($this->field => 'Max installments is 12.');
+        $this->data[$this->field] = 13;
+        $this->data['payment_type'] = 'credit';
         $this->validateFields(null, $expectedError);
     }
 
     /**
      * Método auxiliar na validação dos campos
      * $field = Caso recebido, indica teste de emptyFields
-     * $expectedError = Utilizado quando um campo influencia em validações de outro campo. 
+     * $expectedError = Utilizado quando um campo influencia em validações de outro campo.
      *  Ex: Issuer, que influencia no teste do campo 'payment_type'
      */
     private function validateFields($field = null, $expectedError = null) {

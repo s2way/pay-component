@@ -14,12 +14,11 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
             'amount' => 123456,
             'return_url' => 'http://www.google.com.br',
             'issuer' => 'visa',
-            'card_number' => '153241251234',
+            'card_number' => '153241251234154',
             'due_date' => '072015',
-            'sec_code_status' => 1,
             'security_code' => 619,
             'card_holder' => 'TEST NAME',
-            'payment_type' => 'debito',
+            'payment_type' => 'debit',
             'installments' => 1
         );
     }
@@ -98,7 +97,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
             'issuer' => $this->data['issuer'],
             'card_number' => $this->data['card_number'],
             'due_date' => $this->data['due_date'],
-            'sec_code_status' => $this->data['sec_code_status'],
             'security_code' => $this->data['security_code'],
             'card_holder' => $this->data['card_holder'],
             'payment_type' => $this->data['payment_type'],
@@ -132,8 +130,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testIssuerNotEmpty() {
 
         $expectedError = array(
-            'issuer' => 'Invalid issuer.',
-            'payment_type' => 'Invalid issuer for this payment type.'
+            'issuer' => 'Invalid issuer.'
         );
 
         $this->validateFields('issuer', $expectedError);
@@ -142,8 +139,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testCardNumberNotEmpty() {$this->validateFields('card_number');}
 
     public function testDueDateNotEmpty() {$this->validateFields('due_date');}
-
-    public function testSecCodeStatusNotEmpty() {$this->validateFields('sec_code_status');}
 
     public function testPaymentTypeNotEmpty() {$this->validateFields('payment_type');}
 
@@ -187,7 +182,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testAmoutTooLong() {
         $this->field = 'amount';
         $expectedError = array($this->field => 'Amount is too long.');
-        $this->data[$this->field] = implode(array_fill(0, 13, '1'));;
+        $this->data[$this->field] = implode(array_fill(0, 16, '1'));;
         $this->validateFields(null, $expectedError);
     }
 
@@ -215,8 +210,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testUnknownIssuer() {
         $this->field = 'issuer';
         $expectedError = array(
-            $this->field => 'Unknown issuer.',
-            'payment_type' => 'Invalid issuer for this payment type.'
+            $this->field => 'Unknown issuer.'
         );
         $this->data[$this->field] = 'other issuer';
         $this->validateFields(null, $expectedError);
@@ -232,28 +226,7 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
     public function testInvalidCardNumber() {
         $this->field = 'card_number';
         $expectedError = array($this->field => 'Invalid card_number.');
-        $this->data[$this->field] = 'invalid card number';
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testInvalidDueDateLength() {
-        $this->field = 'due_date';
-        $expectedError = array($this->field => 'Invalid due_date length.');
-        $this->data[$this->field] = 123;
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testDueDateNumeric() {
-        $this->field = 'due_date';
-        $expectedError = array($this->field => 'due_date must be numeric.');
-        $this->data[$this->field] = '1o2015';
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testInvalidSecCodeStatus() {
-        $this->field = 'sec_code_status';
-        $expectedError = array($this->field => 'sec_code_status is invalid.');
-        $this->data[$this->field] = '999';
+        $this->data[$this->field] = 'card number';
         $this->validateFields(null, $expectedError);
     }
 
@@ -261,14 +234,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->field = 'security_code';
         $expectedError = array($this->field => 'Invalid security_code length.');
         $this->data[$this->field] = 123456;
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testInvalidSecurityCode() {
-        $this->field = 'security_code';
-        $expectedError = array($this->field => 'Invalid security_code.');
-        $this->data['sec_code_status'] = 1;
-        $this->data[$this->field] = '';
         $this->validateFields(null, $expectedError);
     }
 
@@ -286,34 +251,18 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->validateFields(null, $expectedError);
     }
 
-    public function testPaymentTypeInvalidIssuer() {
-        $this->field = 'payment_type';
-        $expectedError = array($this->field => 'Invalid issuer for this payment type.');
-        $this->data[$this->field] = 'debito';
-        $this->data['issuer'] = 'amex';
-        $this->validateFields(null, $expectedError);
-    }
-
-    public function testInstallmentsTooLong() {
-        $this->field = 'installments';
-        $expectedError = array($this->field => 'Invalid installments for this payment_type.');
-        $this->data[$this->field] = 9;
-        $this->data['payment_type'] = 'credito_parcelado_loja';
-        $this->validateFields(null, $expectedError);
-    }
-
     public function testInstallmentsPaymentType() {
         $this->field = 'installments';
         $expectedError = array($this->field => 'The payment type allows only 1 installment.');
         $this->data[$this->field] = 2;
-        $this->data['payment_type'] = 'debito';
+        $this->data['payment_type'] = 'debit';
         $this->validateFields(null, $expectedError);
     }
 
     /**
      * Método auxiliar na validação dos campos
      * $field = Caso recebido, indica teste de emptyFields
-     * $expectedError = Utilizado quando um campo influencia em validações de outro campo. 
+     * $expectedError = Utilizado quando um campo influencia em validações de outro campo.
      *  Ex: Issuer, que influencia no teste do campo 'payment_type'
      */
     private function validateFields($field = null, $expectedError = null) {

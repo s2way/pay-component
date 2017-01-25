@@ -38,7 +38,7 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid amount.'
                 ),
                 'maxLength' => array(
-                    'params' => 12,
+                    'params' => 15,
                     'message' => 'Amount is too long.'
                 ),
                 'greaterThan' => array(
@@ -54,7 +54,7 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid return_url.'
                 ),
                 'maxLength' => array(
-                    'params' => 2048,
+                    'params' => 1024,
                     'message' => 'Return URL is too long.'
                 ),
                 'url' => array(
@@ -66,7 +66,7 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid issuer.'
                 ),
                 'inList' => array(
-                    'params' => array('visa','mastercard','diners','discover','elo','amex','jcb','aura'),
+                    'params' => array('visa','master','diners','discover','elo','amex','jcb','aura'),
                     'message' => 'Unknown issuer.'
                 )
             ),
@@ -75,7 +75,7 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid payment_type.'
                 ),
                 'inList' => array(
-                    'params' => array('credit', 'debit'),
+                    'params' => array('credit'),
                     'message' => 'Unknown payment_type.'
                 ),
                 'paymentTypeIssuer' => array(
@@ -87,12 +87,12 @@ class PaymentToken extends Payment {
                     'message' => 'Invalid installments.'
                 ),
                 'installmentsPaymentType' => array(
-                    'params' => array('debito', 'credito_a_vista'),
+                    'params' => array('debit'),
                     'message' => 'The payment type allows only 1 installment.'
                 ),
                 'installmentsMaxValue' => array(
-                    'params' => 8,
-                    'message' => 'Invalid installments for this payment_type.'
+                    'params' => 12,
+                    'message' => 'Max installments is 12.'
                 )
             ),
             'token' => array(

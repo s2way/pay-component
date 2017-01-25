@@ -26,18 +26,13 @@ class Requester {
 			return false;
 		}
 		$response = json_decode($this->httpConnector->getResponse(), true);
+
 		if ($this->httpConnector->requestSucceded()) {
 			$this->getPayment()->setId($response['order_id']);
-		}else if ($this->httpConnector->isPayValidationError()){
-			// TODO: Verificar o que fazer
-			$this->error = $response;
-			return false;
-		}else{
-			// Retorna o erro em formato de objeto
-			$this->error = $response;
-			return false;
+			return true;
 		}
-		return true;
+		$this->error = $response;
+		return false;
 	}
 
 	/**
@@ -64,7 +59,7 @@ class Requester {
 
 	public function getStatus($id, $authToken) {
 		$this->method = METHOD_GET;
-		$this->URL = "{$this->baseURL}/orders?reference={$id}";
+		$this->URL = "{$this->baseURL}/orders/{$this->getPayment()->getId()}";
 
 		if (!$this->sendGet()) {
 			return false;
@@ -88,7 +83,6 @@ class Requester {
 		// Retorna o erro em formato de objeto
 		$this->error = $response;
 		return false;
-
 	}
 
 	private function updatePayment($response) {

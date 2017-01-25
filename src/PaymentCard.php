@@ -47,7 +47,7 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid amount.'
 				),
 				'maxLength' => array(
-					'params' => 12,
+					'params' => 15,
 					'message' => 'Amount is too long.'
 				),
 				'greaterThan' => array(
@@ -63,7 +63,7 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid return_url.'
 				),
 				'maxLength' => array(
-					'params' => 2048,
+					'params' => 1024,
 					'message' => 'Return URL is too long.'
 				),
 				'url' => array(
@@ -84,7 +84,7 @@ class PaymentCard extends Payment {
 					'message' => 'Invalid card_number.'
 				),
 				'maxLength' => array(
-					'params' => 19,
+					'params' => 16,
 					'message' => 'card_number is too long.'
 				),
 				'numeric' => array(

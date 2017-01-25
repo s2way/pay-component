@@ -103,7 +103,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testMethodCreationSuccess(){
-        $expectedData = '"123456789abcdefg"';
+        $expectedData = '{"order_id": "123456789abcdefg"}';
 
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
@@ -147,13 +147,18 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
 
     public function testMethodProcessRequestPayValidationError() {
 
-        $throwError = '{"name": "ValidationFailed","fields": {"payment_type": {"message": "Field is invalid"},"installments": {"message": "Field is invalid"},"id": {"message": "Processing token is different from the creation token"}}}';
-        $expectedError = array('payment_type' => 'Field is invalid', 'installments' => 'Field is invalid', 'id' => 'Processing token is different from the creation token');
-
+        $throwError = '{
+          "code": "UnprocessableEntityError",
+          "message": "[{\"code\":602,\"message\":\"Unknown auth_token\"},{\"code\":628,\"message\":\"Empty payment_type\"},{\"code\":631,\"message\":\"Empty installments\"},{\"code\":613,\"message\":\"Order not found\"}]"
+        }';
+        $expectedError = array(
+            'code' => 'UnprocessableEntityError',
+            'message' => '[{"code":602,"message":"Unknown auth_token"},{"code":628,"message":"Empty payment_type"},{"code":631,"message":"Empty installments"},{"code":613,"message":"Order not found"}]'
+        );
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
-        $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(true);
+        $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
 
 
         $requester = new Requester($mockedHttpConnector);
@@ -191,7 +196,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
-        
+
         $requester = new Requester($mockedHttpConnector);
         $requester->setPayment($this->paymentCard);
 
@@ -208,7 +213,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
-        
+
         $requester = new Requester($mockedHttpConnector);
         $requester->setPayment($this->paymentCard);
 
@@ -225,7 +230,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
-        
+
         $payment = new PaymentToken();
         $this->paymentData['token'] = 'weijwr0329esofk';
         $payment->setData($this->paymentData);
