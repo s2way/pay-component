@@ -56,7 +56,7 @@ class HttpConnectorTest extends PHPUnit_Framework_TestCase {
         $this->assertNotNull($connector->getResponse());
     }
 
-    public function  testSendPostSuccess () {
+    public function testSendPostSuccess () {
         $connector = new HttpConnector();
         $connector->setMethod('POST');
         $connector->setURL('http://www.google.com.br');

@@ -28,29 +28,6 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $this->paymentCard->setData($this->paymentData);
     }
 
-    public function testSetterPayment() {
-        $expectedData = array(
-            'data' => array(
-                'id' => '0.16624199342913926',
-                'auth_token' => 'token_floripa',
-                'description' => 'Descrição',
-                'amount' => '100',
-                'return_url' => 'http://www.google.com',
-                'issuer' => 'visa',
-                'card_number' => '1031654821043574',
-                'due_date' => '122015',
-                'sec_code_status' => '1',
-                'security_code' => '123',
-                'card_holder' => 'Andre_pega_um_pega_geral',
-                'payment_type' => 'credito_a_vista',
-                'installments' => '1'
-            )
-        );
-        $requester = new Requester();
-        $requester->setPayment($expectedData);
-        $this->assertEquals($expectedData, $requester->payment);
-    }
-
     public function testMethodCreationRequestError(){
 
         $expectedError = 'some request error';
@@ -207,7 +184,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testMethodProcessSuccessWithoutAuthURL() {
-        $expectedResponse = '{"return_url": "http://somerul.com", "token" : "client_token"}';
+        $expectedResponse = '{"token" : "client_token"}';
 
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
@@ -219,17 +196,15 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($requester->process());
         $this->assertNull($requester->getError());
-        $this->assertEquals('http://somerul.com', $this->paymentCard->getReturnURL());
+        $this->assertEquals(null, $this->paymentCard->getReturnURL());
         $this->assertEquals('client_token', $this->paymentCard->getToken());
     }
 
     public function testMethodProcessSuccessWithPurchaseByToken() {
-        $expectedResponse = '{"return_url": "http://somerul.com"}';
-
         $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
-        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
+        $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn(null);
 
         $payment = new PaymentToken();
         $this->paymentData['token'] = 'weijwr0329esofk';
@@ -240,6 +215,6 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($requester->process());
         $this->assertNull($requester->getError());
-        $this->assertEquals('http://somerul.com', $payment->getReturnURL());
+        $this->assertEquals(null, $payment->getReturnURL());
     }
 }

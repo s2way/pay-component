@@ -2,8 +2,6 @@
 
 namespace PayComponent;
 
-use PayComponent\Component\Validator;
-
 abstract class Payment {
 
     private $noAuthentication = null;
@@ -11,14 +9,8 @@ abstract class Payment {
     protected $data = null;
     private $errors = null;
     private $authToken = null;
+    private $returnURL = null;
     protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'client_app');
-
-    /**
-     * Dependency injection is ON!
-     */
-    function __construct($validator = null) {
-        $this->validator = $validator ? $validator : new Validator();
-    }
 
     protected abstract function getCreationData();
     protected abstract function getProcessData();

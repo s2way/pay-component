@@ -1,7 +1,6 @@
 <?php
 
 namespace PayComponent;
-use PayComponent\Component\Validator;
 
 require_once ('Constants.php');
 
