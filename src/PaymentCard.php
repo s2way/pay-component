@@ -8,7 +8,7 @@ class PaymentCard extends Payment {
 
 	private $URL = null;
 	private $token = null;
-	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_authentication', 'save_card');
+	private $processFields = array('issuer','card_number','due_date','sec_code_status','security_code','card_holder','payment_type','installments','auth_token', 'no_authentication', 'save_card', 'return_url');
 
 	public function getCreationData() {
 		return array_intersect_key($this->data, array_flip($this->creationFields));
@@ -16,14 +16,6 @@ class PaymentCard extends Payment {
 
 	public function getProcessData() {
 		return array_intersect_key($this->data, array_flip($this->processFields));
-	}
-
-	public function setToken($token) {
-		$this->token = $token;
-	}
-
-	public function getToken() {
-		return $this->token;
 	}
 
 	public function rules() {

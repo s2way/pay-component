@@ -13,6 +13,7 @@ class PayComponent {
     private $error = null;
     // Injected properties
     private $paymentCard = null;
+    private $paymentToken = null;
     private $requester = null;
 
     public function __construct($payment = null, $requester = null) {
@@ -23,14 +24,8 @@ class PayComponent {
     }
 
     public function purchaseByCard($data) {
-
         $this->paymentCard->setData($data);
-        $this->paymentCard->setAuthToken($this->authToken);
-
-        if (!$this->paymentCard->validate()){
-            $this->error = $this->paymentCard->getErrors();
-            return false;
-        }
+        $this->requester->setAuthToken($this->authToken);
         $this->payment = $this->paymentCard;
 
         return $this->request();
@@ -38,13 +33,9 @@ class PayComponent {
 
     public function purchaseByToken($data = null) {
         $this->paymentToken->setData($data);
-        $this->paymentToken->setAuthToken($this->authToken);
-        if (!$this->paymentToken->validate()){
-            $this->error = $this->paymentToken->getErrors();
-            return false;
-        }
-
+        $this->requester->setAuthToken($this->authToken);
         $this->payment = $this->paymentToken;
+
         return $this->request();
     }
 
@@ -54,7 +45,6 @@ class PayComponent {
     }
 
     private function request() {
-
         $this->requester->setBaseURL($this->payURL);
         $this->requester->setPayment($this->payment);
 
