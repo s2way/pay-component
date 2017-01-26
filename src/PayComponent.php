@@ -24,16 +24,17 @@ class PayComponent {
     }
 
     public function purchaseByCard($data) {
+        $this->paymentCard->setAuthToken($this->authToken);
         $this->paymentCard->setData($data);
-        $this->requester->setAuthToken($this->authToken);
+        $this->paymentCard->addAuthenticationMethod();
         $this->payment = $this->paymentCard;
 
         return $this->request();
     }
 
     public function purchaseByToken($data = null) {
+        $this->paymentToken->setAuthToken($this->authToken);
         $this->paymentToken->setData($data);
-        $this->requester->setAuthToken($this->authToken);
         $this->payment = $this->paymentToken;
 
         return $this->request();
@@ -47,6 +48,7 @@ class PayComponent {
     private function request() {
         $this->requester->setBaseURL($this->payURL);
         $this->requester->setPayment($this->payment);
+
 
         if (!$this->requester->create()) {
             $this->error = $this->requester->getError();

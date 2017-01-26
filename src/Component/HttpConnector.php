@@ -12,9 +12,7 @@ class HttpConnector {
     private $URL = null;
     private $retries = 0;
 
-    public function send() {
-
-        $authToken = isSet($this->data['auth_token']) ? $this->data['auth_token'] : null;
+    public function send($authToken) {
 
         if ($this->method === METHOD_POST) {
             $postFields = json_encode($this->data);

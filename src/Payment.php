@@ -6,11 +6,11 @@ use PayComponent\Component\Validator;
 
 abstract class Payment {
 
-    private $authToken = null;
     private $noAuthentication = null;
     private $id = null;
     protected $data = null;
     private $errors = null;
+    private $authToken = null;
     protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'client_app');
 
     /**
@@ -20,7 +20,6 @@ abstract class Payment {
         $this->validator = $validator ? $validator : new Validator();
     }
 
-    protected abstract function rules();
     protected abstract function getCreationData();
     protected abstract function getProcessData();
 
@@ -42,6 +41,10 @@ abstract class Payment {
 
     public function getNoAutentication(){
         return $this->noAuthentication;
+    }
+
+    public function addAuthenticationMethod() {
+        $this->data['no_authentication'] = $this->noAuthentication;
     }
 
     public function setId($id){
@@ -66,16 +69,5 @@ abstract class Payment {
 
     public function getErrors(){
         return $this->errors;
-    }
-
-    public function validate() {
-        $this->data['auth_token'] = $this->authToken;
-        $this->data['no_authentication'] = $this->noAuthentication;
-
-        if (!$this->validator->validate($this->rules(), $this->data)) {
-            $this->setErrors($this->validator->getValidationErrors());
-            return false;
-        }
-        return true;
     }
 }
