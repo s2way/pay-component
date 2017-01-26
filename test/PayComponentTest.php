@@ -59,6 +59,20 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
         $this->assertNull($payComponent->getError());
     }
 
+    public function testPurchaseByTokenValidationError() {
+
+        $expectedError = 'any error';
+
+        $mockedPaymentToken = $this->getMockBuilder('PayComponent\PaymentToken')->setMethods(array('setData', 'setAuthToken', 'validate','getErrors'))->getMock();
+        $mockedPaymentToken->expects($this->any())->method('validate')->willReturn(false);
+        $mockedPaymentToken->expects($this->any())->method('getErrors')->willReturn($expectedError);
+
+        $payComponent = new PayComponent($mockedPaymentToken);
+        $payComponent->setAuthToken('anytoken');
+        $this->assertFalse($payComponent->purchaseByToken(array('any field' => 'any value')));
+        $this->assertEquals($expectedError, $payComponent->getError());
+    }
+
     public function testPurchaseByTokenCreationError() {
         $expectedError = 'some error';
 

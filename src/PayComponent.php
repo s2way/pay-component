@@ -1,6 +1,7 @@
 <?php
 
 namespace PayComponent;
+use PayComponent\Component\Validator;
 
 require_once ('Constants.php');
 
@@ -12,7 +13,6 @@ class PayComponent {
     private $error = null;
     // Injected properties
     private $paymentCard = null;
-    private $paymentToken = null;
     private $requester = null;
 
     public function __construct($payment = null, $requester = null) {
@@ -23,19 +23,28 @@ class PayComponent {
     }
 
     public function purchaseByCard($data) {
-        $this->paymentCard->setAuthToken($this->authToken);
+
         $this->paymentCard->setData($data);
-        $this->paymentCard->addAuthenticationMethod();
+        $this->paymentCard->setAuthToken($this->authToken);
+
+        if (!$this->paymentCard->validate()){
+            $this->error = $this->paymentCard->getErrors();
+            return false;
+        }
         $this->payment = $this->paymentCard;
 
         return $this->request();
     }
 
     public function purchaseByToken($data = null) {
-        $this->paymentToken->setAuthToken($this->authToken);
         $this->paymentToken->setData($data);
-        $this->payment = $this->paymentToken;
+        $this->paymentToken->setAuthToken($this->authToken);
+        if (!$this->paymentToken->validate()){
+            $this->error = $this->paymentToken->getErrors();
+            return false;
+        }
 
+        $this->payment = $this->paymentToken;
         return $this->request();
     }
 
@@ -45,9 +54,9 @@ class PayComponent {
     }
 
     private function request() {
+
         $this->requester->setBaseURL($this->payURL);
         $this->requester->setPayment($this->payment);
-
 
         if (!$this->requester->create()) {
             $this->error = $this->requester->getError();
@@ -60,10 +69,6 @@ class PayComponent {
         }
 
         return true;
-    }
-
-    public function setRetries($retries) {
-        $this->requester->setRetries($retries);
     }
 
     public function setAuthToken($authToken) {

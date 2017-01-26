@@ -10,8 +10,7 @@ class Requester {
 	private $response = null;
 	private $baseURL = null;
 	private $URL = null;
-	private $authToken = null;
-	private $payment = null;
+	private $authenticationURL = null;
 
 	 public function __construct($httpConnector = null) {
         $this->httpConnector = $httpConnector ? $httpConnector : new HttpConnector();
@@ -27,14 +26,18 @@ class Requester {
 			return false;
 		}
 		$response = json_decode($this->httpConnector->getResponse(), true);
-
 		if ($this->httpConnector->requestSucceded()) {
-			$this->getPayment()->setId($response['order_id']);
-			return true;
+			$this->getPayment()->setId($response);
+		}else if ($this->httpConnector->isPayValidationError()){
+			// TODO: Verificar o que fazer
+			$this->error = $response;
+			return false;
+		}else{
+			// Retorna o erro em formato de objeto
+			$this->error = $response;
+			return false;
 		}
-
-		$this->error = $response;
-		return false;
+		return true;
 	}
 
 	/**
@@ -53,17 +56,29 @@ class Requester {
 		if ($this->httpConnector->requestSucceded()) {
 			// Atualiza o objeto pagamento
 			$this->updatePayment($response);
-			return true;
+		}else if ($this->httpConnector->isPayValidationError()){
+			// Caso for um erro de validação do pay, formata o array de validações para deixar no mesmo formato de erros do componente
+			$returnError = array();
+			$validationFieldsError = $response['fields'];
+			foreach ($validationFieldsError as $key => $value) {
+				$returnError[$key] = $value['message'];
+			}
+
+			$this->error = $returnError;
+			return false;
+		}else{
+			// Retorna o erro em formato de objeto
+			$this->error = $response;
+			return false;
 		}
-		$this->error = $response;
-		return false;
+		return true;
 	}
 
 	public function getStatus($id, $authToken) {
 		$this->method = METHOD_GET;
-		$this->URL = "{$this->baseURL}/orders?reference={$id}";
+		$this->URL = "{$this->baseURL}/orders/status/{$id}?auth_token={$authToken}";
 
-		if (!$this->sendGet($authToken)) {
+		if (!$this->sendGet()) {
 			return false;
 		}
 		// Decodifica a resposta
@@ -71,40 +86,42 @@ class Requester {
 		// Se houve sucesso
 		if ($this->httpConnector->requestSucceded()) {
 			// Retorna o status do pagamento
-			$paymentStatus = isset($response['status']) ? $response['status'] : null;
-			if ($paymentStatus) {
-				if ($paymentStatus == 'REJECTED') {
-					return array(
-						'status' => $paymentStatus,
-						'reason' => $response['acquirer_message'],
-						'action' => $response['acquirer_action']
-					);
-				} else {
-					return array('status' => $paymentStatus);
-				}
+			if (isset($response[0]['status'])) {
+				return $response[0]['status'];
 			} else {
 				return false;
 			}
+		} else if ($this->httpConnector->isPayValidationError()) {
+			// Caso for um erro de validação do pay, formata o array de validações para deixar no mesmo formato de erros do componente
+			$returnError = array();
+			$validationFieldsError = $response['fields'];
+			foreach ($validationFieldsError as $key => $value) {
+				$returnError[$key] = $value['message'];
+			}
+
+			$this->error = $returnError;
+			return false;
+		} else {
+			// Retorna o erro em formato de objeto
+			$this->error = $response;
+			return false;
 		}
-		// Retorna o erro em formato de objeto
-		$this->error = $response;
-		return false;
 	}
 
 	private function updatePayment($response) {
 		// Se for pagamento por cartão
 		if ($this->getPayment() instanceof PaymentCard) {
-			// Testa se a resposta contém uma url de autenticação; isto é importante porque, caso
+			// Testa se a resposta contém uma url de autenticação; isto é importante porque, caso 
 			// a forma de autorização pule a etapa de autenticação, somente a return_url é recebida
-			if (!empty($response)) {
-				if (array_key_exists('authentication_url', $response)) {
-					$this->getPayment()->setReturnURL($response['authentication_url']);
-				}
-				// Adiciona o token do cartão à resposta
-				if (array_key_exists('token', $response)) {
-					$this->getPayment()->setToken($response['token']);
-				}
+			if (array_key_exists('authentication_url', $response)) {
+				$this->getPayment()->setReturnURL($response['authentication_url']);
+			} else {
+				$this->getPayment()->setReturnURL($response['return_url']);
 			}
+			// Adiciona o token do cartão à resposta
+			$this->getPayment()->setToken($response['token']);
+		} else { // Se for pagamento por token
+			$this->getPayment()->setReturnURL($response['return_url']);
 		}
 	}
 
@@ -112,26 +129,22 @@ class Requester {
 		$this->httpConnector->setMethod($this->method);
 		$this->httpConnector->setUrl($this->URL);
 		$this->httpConnector->setData($data);
-		if (!$this->httpConnector->send($this->getPayment()->getAuthToken())) {
+		if (!$this->httpConnector->send()) {
 			$this->error = $this->httpConnector->getError();
 			return false;
 		}
 		return true;
 	}
 
-	private function sendGet($authToken) {
+	private function sendGet() {
 		$this->httpConnector->setMethod($this->method);
 		$this->httpConnector->setUrl($this->URL);
-		if (!$this->httpConnector->send($authToken)) {
+		if (!$this->httpConnector->send()) {
 			$this->error = $this->httpConnector->getError();
 			return false;
 		}
 		return true;
 	}
-
-	public function setRetries($retries) {
-        $this->httpConnector->setRetries = $retries;
-    }
 
 	public function setBaseURL($url) {
 		$this->baseURL = $url;
@@ -147,9 +160,5 @@ class Requester {
 
 	public function getError() {
 		return $this->error;
-	}
-
-	public function setAuthToken($authToken) {
-		$this->authToken = $authToken;
 	}
 }
