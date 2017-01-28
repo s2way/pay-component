@@ -14,6 +14,7 @@ class PayComponent {
     private $paymentCard = null;
     private $paymentToken = null;
     private $requester = null;
+    private $authenticationMethod = null;
 
     public function __construct($payment = null, $requester = null) {
         $this->payURL = PAY_BASE_URL;
@@ -25,7 +26,7 @@ class PayComponent {
     public function purchaseByCard($data) {
         $this->paymentCard->setAuthToken($this->authToken);
         $this->paymentCard->setData($data);
-        $this->paymentCard->addAuthenticationMethod();
+        $this->paymentCard->addAuthenticationMethod($this->authenticationMethod);
         $this->payment = $this->paymentCard;
 
         return $this->request();
@@ -34,6 +35,7 @@ class PayComponent {
     public function purchaseByToken($data = null) {
         $this->paymentToken->setAuthToken($this->authToken);
         $this->paymentToken->setData($data);
+        $this->paymentToken->addAuthenticationMethod($this->authenticationMethod);
         $this->payment = $this->paymentToken;
 
         return $this->request();
@@ -99,7 +101,7 @@ class PayComponent {
     }
 
     public function setNoAuthentication($value) {
-        $this->paymentCard->setNoAuthentication($value);
+        $this->authenticationMethod = $value;
     }
 
 }

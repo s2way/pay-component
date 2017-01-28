@@ -4,7 +4,6 @@ namespace PayComponent;
 
 abstract class Payment {
 
-    private $noAuthentication = null;
     private $id = null;
     protected $data = null;
     private $errors = null;
@@ -27,16 +26,12 @@ abstract class Payment {
         return $this->authToken;
     }
 
-    public function setNoAuthentication($noAuthentication){
-        $this->noAuthentication = $noAuthentication;
-    }
-
     public function getNoAutentication(){
-        return $this->noAuthentication;
+        return $this->data['no_authentication'];
     }
 
-    public function addAuthenticationMethod() {
-        $this->data['no_authentication'] = $this->noAuthentication;
+    public function addAuthenticationMethod($authenticationMethod) {
+        $this->data['no_authentication'] = $authenticationMethod;
     }
 
     public function setId($id){
