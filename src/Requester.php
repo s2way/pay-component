@@ -97,7 +97,7 @@ class Requester {
 				$this->getPayment()->setReturnURL($response['authentication_url']);
 			}
 			// Adiciona o token do cartão à resposta
-			if (array_key_exists('token', $response)) {
+			if ($this->getPayment() instanceof PaymentCard && array_key_exists('token', $response)) {
 				$this->getPayment()->setToken($response['token']);
 			}
 		}
@@ -146,5 +146,9 @@ class Requester {
 
 	public function setAuthToken($authToken) {
 		$this->authToken = $authToken;
+	}
+
+	public function getStatusCode() {
+		return $this->httpConnector->getStatus();
 	}
 }

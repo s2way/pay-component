@@ -78,6 +78,10 @@ class PayComponent {
         return $this->error;
     }
 
+    public function getStatusCode() {
+        return $this->requester->getStatusCode();
+    }
+
     public function getStatus() {
         return $this->requester->getPayment()->getStatus();
     }
