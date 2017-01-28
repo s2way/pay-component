@@ -92,18 +92,13 @@ class Requester {
 	}
 
 	private function updatePayment($response) {
-		// Se for pagamento por cartão
-		if ($this->getPayment() instanceof PaymentCard) {
-			// Testa se a resposta contém uma url de autenticação; isto é importante porque, caso
-			// a forma de autorização pule a etapa de autenticação, somente a return_url é recebida
-			if (!empty($response)) {
-				if (array_key_exists('authentication_url', $response)) {
-					$this->getPayment()->setReturnURL($response['authentication_url']);
-				}
-				// Adiciona o token do cartão à resposta
-				if (array_key_exists('token', $response)) {
-					$this->getPayment()->setToken($response['token']);
-				}
+		if (!empty($response)) {
+			if (array_key_exists('authentication_url', $response)) {
+				$this->getPayment()->setReturnURL($response['authentication_url']);
+			}
+			// Adiciona o token do cartão à resposta
+			if (array_key_exists('token', $response)) {
+				$this->getPayment()->setToken($response['token']);
 			}
 		}
 	}
