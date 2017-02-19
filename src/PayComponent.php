@@ -1,7 +1,6 @@
 <?php
 
 namespace PayComponent;
-use PayComponent\Component\Validator;
 
 require_once ('Constants.php');
 
@@ -13,7 +12,9 @@ class PayComponent {
     private $error = null;
     // Injected properties
     private $paymentCard = null;
+    private $paymentToken = null;
     private $requester = null;
+    private $authenticationMethod = null;
 
     public function __construct($payment = null, $requester = null) {
         $this->payURL = PAY_BASE_URL;
@@ -23,28 +24,20 @@ class PayComponent {
     }
 
     public function purchaseByCard($data) {
-
-        $this->paymentCard->setData($data);
         $this->paymentCard->setAuthToken($this->authToken);
-
-        if (!$this->paymentCard->validate()){
-            $this->error = $this->paymentCard->getErrors();
-            return false;
-        }
+        $this->paymentCard->setData($data);
+        $this->paymentCard->addAuthenticationMethod($this->authenticationMethod);
         $this->payment = $this->paymentCard;
 
         return $this->request();
     }
 
     public function purchaseByToken($data = null) {
-        $this->paymentToken->setData($data);
         $this->paymentToken->setAuthToken($this->authToken);
-        if (!$this->paymentToken->validate()){
-            $this->error = $this->paymentToken->getErrors();
-            return false;
-        }
-
+        $this->paymentToken->setData($data);
+        $this->paymentToken->addAuthenticationMethod($this->authenticationMethod);
         $this->payment = $this->paymentToken;
+
         return $this->request();
     }
 
@@ -54,9 +47,9 @@ class PayComponent {
     }
 
     private function request() {
-
         $this->requester->setBaseURL($this->payURL);
         $this->requester->setPayment($this->payment);
+
 
         if (!$this->requester->create()) {
             $this->error = $this->requester->getError();
@@ -71,6 +64,10 @@ class PayComponent {
         return true;
     }
 
+    public function setRetries($retries) {
+        $this->requester->setRetries($retries);
+    }
+
     public function setAuthToken($authToken) {
         $this->authToken = $authToken;
     }
@@ -81,6 +78,10 @@ class PayComponent {
 
     public function getError() {
         return $this->error;
+    }
+
+    public function getStatusCode() {
+        return $this->requester->getStatusCode();
     }
 
     public function getStatus() {
@@ -100,7 +101,7 @@ class PayComponent {
     }
 
     public function setNoAuthentication($value) {
-        $this->paymentCard->setNoAuthentication($value);
+        $this->authenticationMethod = $value;
     }
 
 }

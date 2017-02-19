@@ -10,9 +10,10 @@ class HttpConnector {
     private $method = null;
     private $data = null;
     private $URL = null;
+    private $retries = 0;
 
-    public function send() {
-        
+    public function send($authToken = null) {
+
         if ($this->method === METHOD_POST) {
             $postFields = json_encode($this->data);
 
@@ -30,9 +31,10 @@ class HttpConnector {
 
         $options = Array(
             CURLOPT_HTTPHEADER => Array(
+                "Authorization: Bearer $authToken",
                 "Content-Type: application/json",
                 $contentLength
-            ),  
+            ),
             CURLOPT_URL => $this->URL,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,
@@ -41,14 +43,18 @@ class HttpConnector {
         );
 
         $options = ($options + $methodOptions);
-
         $curl = curl_init();
         curl_setopt_array($curl, $options);
+
+        $success = $this->request($curl, $this->retries);
+        return $success;
+    }
+
+    public function request($curl, $retries) {
         $resp = curl_exec($curl);
         $info = curl_getinfo($curl);
         $error = curl_errno($curl);
         $errorMessage = curl_error($curl);
-        curl_close($curl);
 
         if ($error) {
             $this->error = array('code' => $error, 'message' => $errorMessage);
@@ -57,7 +63,13 @@ class HttpConnector {
 
         $this->setStatus($info['http_code']);
         $this->setResponse($resp);
-        return true;
+
+        if ($this->status == 504 && $retries > 0) {
+            $this->request($curl, --$retries);
+        } else {
+            curl_close($curl);
+            return true;
+        }
 
     }
 
@@ -82,6 +94,10 @@ class HttpConnector {
 
     public function setStatus($status){
         $this->status = $status;
+    }
+
+    public function setRetries($retries = 0){
+        $this->retries = $retries;
     }
 
     public function getStatus(){

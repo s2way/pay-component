@@ -2,25 +2,15 @@
 
 namespace PayComponent;
 
-use PayComponent\Component\Validator;
-
 abstract class Payment {
 
-    private $authToken = null;
-    private $noAuthentication = null;
     private $id = null;
     protected $data = null;
     private $errors = null;
-    protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'return_url');
+    private $authToken = null;
+    private $returnURL = null;
+    protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'client_app');
 
-    /**
-     * Dependency injection is ON!
-     */
-    function __construct($validator = null) {
-        $this->validator = $validator ? $validator : new Validator();
-    }
-
-    protected abstract function rules();
     protected abstract function getCreationData();
     protected abstract function getProcessData();
 
@@ -36,12 +26,12 @@ abstract class Payment {
         return $this->authToken;
     }
 
-    public function setNoAuthentication($noAuthentication){
-        $this->noAuthentication = $noAuthentication;
+    public function getNoAutentication(){
+        return $this->data['no_authentication'];
     }
 
-    public function getNoAutentication(){
-        return $this->noAuthentication;
+    public function addAuthenticationMethod($authenticationMethod) {
+        $this->data['no_authentication'] = $authenticationMethod;
     }
 
     public function setId($id){
@@ -66,16 +56,5 @@ abstract class Payment {
 
     public function getErrors(){
         return $this->errors;
-    }
-
-    public function validate() {
-        $this->data['auth_token'] = $this->authToken;
-        $this->data['no_authentication'] = $this->noAuthentication;
-
-        if (!$this->validator->validate($this->rules(), $this->data)) {
-            $this->setErrors($this->validator->getValidationErrors());
-            return false;
-        }
-        return true;
     }
 }
