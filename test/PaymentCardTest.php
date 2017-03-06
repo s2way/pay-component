@@ -42,12 +42,6 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $pay->getId());
     }
 
-    public function testSetNoAutentication() {
-        $pay = new PaymentCard();
-        $pay->setNoAuthentication(true);
-        $this->assertTrue($pay->getNoAutentication());
-    }
-
     /**
      *******************************
      ***** TESTS CLASS METHODS *****
