@@ -77,7 +77,8 @@ class Requester {
 					return array(
 						'status' => $paymentStatus,
 						'reason' => $response['acquirer_message'],
-						'action' => $response['acquirer_action']
+						'action' => $response['acquirer_action'],
+						'action' => $response['acquirer_code']
 					);
 				} else {
 					return array('status' => $paymentStatus);
