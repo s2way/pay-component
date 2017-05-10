@@ -41,6 +41,11 @@ class PayComponent {
         return $this->request();
     }
 
+    public function cancel($id) {
+        $this->requester->setBaseURL($this->payURL);
+        return $this->requester->cancel($id, $this->authToken);
+    }
+
     public function status($id) {
         $this->requester->setBaseURL($this->payURL);
         return $this->requester->getStatus($id, $this->authToken);

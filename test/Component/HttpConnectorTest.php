@@ -69,4 +69,18 @@ class HttpConnectorTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedStatusCode, $connector->getStatus());
         $this->assertNotNull($connector->getResponse());
     }
+
+    public function testPut() {
+        $connector = new HttpConnector();
+        $connector->setMethod('PUT');
+        $connector->setURL('http://www.google.com.br');
+        $connector->setData(array());
+
+        $expectedStatusCode = 405;
+
+        $this->assertTrue($connector->send());
+        $this->assertNull($connector->getError());
+        $this->assertEquals($expectedStatusCode, $connector->getStatus());
+        $this->assertNotNull($connector->getResponse());
+    }
 }
