@@ -32,7 +32,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
 
         $expectedError = 'some request error';
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getError'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getError'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
         $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
 
@@ -48,7 +48,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $throwError = '{"error": "some pay error"}';
         $expectedError = array('error' => 'some pay error');
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
@@ -66,7 +66,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $throwError = '{"error": "other error"}';
         $expectedError = array('error' => 'other error');
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod','setUrl','setData','send','getResponse', 'requestSucceded', 'isPayValidationError'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
@@ -82,7 +82,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     public function testMethodCreationSuccess(){
         $expectedData = '{"order_id": "123456789abcdefg"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('send', 'requestSucceded', 'getResponse', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(200);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedData);
@@ -106,7 +106,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $expectedError = 'some error';
         $expectedURL = "{$baseURL}/orders/{$orderId}";
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getError', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('send', 'getError', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(false);
         $mockedHttpConnector->expects($this->any())->method('getError')->willReturn($expectedError);
         $mockedHttpConnector->expects($this->any())->method('setUrl')->will($this->returnCallback(function($url) use ($expectedURL) {
@@ -132,7 +132,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
             'code' => 'UnprocessableEntityError',
             'message' => '[{"code":602,"message":"Unknown auth_token"},{"code":628,"message":"Empty payment_type"},{"code":631,"message":"Empty installments"},{"code":613,"message":"Order not found"}]'
         );
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(false);
@@ -152,7 +152,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $throwError = '{"error": "other error"}';
         $expectedError = array('error' => 'other error');
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'setData','send', 'requestSucceded', 'isPayValidationError','getResponse'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($throwError);
         $mockedHttpConnector->expects($this->any())->method('isPayValidationError')->willReturn(false);
@@ -169,7 +169,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     public function testMethodProcessSuccess() {
         $expectedResponse = '{"authentication_url": "http://somerul.com", "token" : "client_token"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
@@ -186,7 +186,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     public function testMethodProcessSuccessWithoutAuthURL() {
         $expectedResponse = '{"token" : "client_token"}';
 
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn($expectedResponse);
@@ -201,7 +201,7 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testMethodProcessSuccessWithPurchaseByToken() {
-        $mockedHttpConnector = $this->getMockBuilder('PayComponent\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('send', 'getResponse', 'requestSucceded', 'setMethod', 'setUrl', 'setData'))->getMock();
         $mockedHttpConnector->expects($this->any())->method('send')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('requestSucceded')->willReturn(true);
         $mockedHttpConnector->expects($this->any())->method('getResponse')->willReturn(null);
@@ -216,5 +216,290 @@ class RequesterTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($requester->process());
         $this->assertNull($requester->getError());
         $this->assertEquals(null, $payment->getReturnURL());
+    }
+
+    public function testGetOrderByReferenceGetFail() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(null)->getMock();
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getError'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod')
+            ->with('GET');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl')
+            ->with('BASE_URL/orders?reference=REFERENCE');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->with('AUTH_TOKEN')
+            ->will($this->returnValue(false));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getError')
+            ->will($this->returnValue('ERROR'));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->getOrderByReference('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+        $this->assertEquals('GET', $selfClass->method);
+        $this->assertEquals('ERROR', $selfClass->getError());
+
+    }
+
+    public function testGetOrderByReferenceGetResponseError() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(null)->getMock();
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue(true));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getResponse')
+            ->will($this->returnValue('{"response": "RESPONSE"}'));
+        $mockedHttpConnector->expects($this->once())
+            ->method('requestSucceded')
+            ->will($this->returnValue(false));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->getOrderByReference('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+        $this->assertEquals(array('response' => 'RESPONSE'), $selfClass->getError());
+
+    }
+
+    public function testGetOrderByReferenceGetResponseEmpty() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(null)->getMock();
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue(true));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getResponse')
+            ->will($this->returnValue(''));
+        $mockedHttpConnector->expects($this->once())
+            ->method('requestSucceded')
+            ->will($this->returnValue(true));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->getOrderByReference('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+        $this->assertEquals('', $selfClass->getError());
+
+    }
+
+    public function testGetOrderByReference() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(null)->getMock();
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getResponse', 'requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue(true));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getResponse')
+            ->will($this->returnValue('{"response": "RESPONSE"}'));
+        $mockedHttpConnector->expects($this->once())
+            ->method('requestSucceded')
+            ->will($this->returnValue(true));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->getOrderByReference('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertEquals(array('response' => 'RESPONSE'), $result);
+
+    }
+
+    public function testCancelOrderNotFound() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->with('REFERENCE', 'AUTH_TOKEN')
+            ->will($this->returnValue(false));
+
+        $result = $selfClass->cancel('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+
+    }
+
+    public function testCancelPutFail(){
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->with('REFERENCE', 'AUTH_TOKEN')
+            ->will($this->returnValue(array('id' => 'ORDER_ID')));
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getError'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod')
+            ->with('PUT');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl')
+            ->with('BASE_URL/orders/ORDER_ID');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->with('AUTH_TOKEN')
+            ->will($this->returnValue(false));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getError')
+            ->will($this->returnValue('ERROR'));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->cancel('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+        $this->assertEquals('PUT', $selfClass->method);
+        $this->assertEquals('ERROR', $selfClass->getError());
+
+    }
+
+    public function testCancelPutGetResponseError() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->with('REFERENCE', 'AUTH_TOKEN')
+            ->will($this->returnValue(array('id' => 'ORDER_ID')));
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getResponse','requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue(true));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getResponse')
+            ->will($this->returnValue('{"response": "RESPONSE"}'));
+        $mockedHttpConnector->expects($this->once())
+            ->method('requestSucceded')
+            ->will($this->returnValue(false));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->cancel('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+
+    }
+
+    public function testCancel() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->with('REFERENCE', 'AUTH_TOKEN')
+            ->will($this->returnValue(array('id' => 'ORDER_ID')));
+        $selfClass->setBaseURL('BASE_URL');
+
+        $mockedHttpConnector = $this->getMockBuilder('PayComponent\Component\HttpConnector')->setMethods(array('setMethod', 'setUrl', 'send', 'getResponse','requestSucceded'))->getMock();
+        $mockedHttpConnector->expects($this->once())
+            ->method('setMethod');
+        $mockedHttpConnector->expects($this->once())
+            ->method('setUrl');
+        $mockedHttpConnector->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue(true));
+        $mockedHttpConnector->expects($this->once())
+            ->method('getResponse')
+            ->will($this->returnValue(''));
+        $mockedHttpConnector->expects($this->once())
+            ->method('requestSucceded')
+            ->will($this->returnValue(true));
+        $selfClass->httpConnector = $mockedHttpConnector;
+
+        $result = $selfClass->cancel('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertTrue($result);
+
+    }
+
+    public function testGetStatusOrderNotFound() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->with('REFERENCE', 'AUTH_TOKEN')
+            ->will($this->returnValue(false));
+
+        $result = $selfClass->getStatus('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+
+    }
+
+    public function testGetStatusNotSet() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->will($this->returnValue(array('id' => 'ORDER_ID')));
+
+        $result = $selfClass->getStatus('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertFalse($result);
+
+    }
+
+    public function testGetStatusApproved() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->will($this->returnValue(array('id' => 'ORDER_ID', 'status' => 'APPROVED')));
+
+        $result = $selfClass->getStatus('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertEquals(array('status' => 'APPROVED'), $result);
+
+    }
+
+    public function testGetStatusRejected() {
+
+        $selfClass = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('getOrderByReference'))->getMock();
+        $selfClass->expects($this->once())
+            ->method('getOrderByReference')
+            ->will($this->returnValue(array(
+                'id' => 'ORDER_ID',
+                'status' => 'REJECTED',
+                'acquirer_message' => 'MESSAGE', 
+                'acquirer_action' => 'ACTION', 
+                'acquirer_code' => 'CODE'
+            )));
+
+        $result = $selfClass->getStatus('REFERENCE', 'AUTH_TOKEN');
+
+        $this->assertEquals(array(
+            'status' => 'REJECTED',
+            'reason' => 'MESSAGE',
+            'action' => 'ACTION',
+            'code' => 'CODE'
+            ), $result);
+
     }
 }

@@ -22,6 +22,16 @@ class HttpConnector {
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => $postFields
             );
+        } else if ($this->method === METHOD_PUT) {
+
+            $postFields = json_encode($this->data);
+
+            $contentLength = "Content-length: ".strlen($postFields);
+
+            $methodOptions = Array(
+                CURLOPT_CUSTOMREQUEST => METHOD_PUT,
+                CURLOPT_POSTFIELDS => $postFields
+            );
         } else {
             $contentLength = null;
             $methodOptions = Array(
@@ -43,6 +53,7 @@ class HttpConnector {
         );
 
         $options = ($options + $methodOptions);
+
         $curl = curl_init();
         curl_setopt_array($curl, $options);
 

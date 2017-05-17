@@ -151,4 +151,23 @@ class PayComponentTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($expectedRedirectURL, $payComponent->getRedirectURL());
     }
+
+    public function testCancel(){
+        $mockedRequester = $this->getMockBuilder('PayComponent\Requester')->setMethods(array('setBaseURL', 'cancel'))->getMock();
+        $mockedRequester->expects($this->once())
+            ->method('setBaseURL')
+            ->with('URL');
+        $mockedRequester->expects($this->once())
+            ->method('cancel')
+            ->with('ID', 'AUTH_TOKEN')
+            ->will($this->returnValue('CANCEL_RETURN'));
+
+        $payComponent = new PayComponent(null, $mockedRequester);
+        $payComponent->setAuthToken('AUTH_TOKEN');
+        $payComponent->setPayURL('URL');
+
+        $result = $payComponent->cancel('ID');
+
+        $this->assertEquals('CANCEL_RETURN', $result);
+    }
 }

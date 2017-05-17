@@ -59,9 +59,9 @@ class Requester {
 		return false;
 	}
 
-	public function getStatus($id, $authToken) {
+	public function getOrderByReference($reference, $authToken) {
 		$this->method = METHOD_GET;
-		$this->URL = "{$this->baseURL}/orders?reference={$id}";
+		$this->URL = "{$this->baseURL}/orders?reference={$reference}";
 
 		if (!$this->sendGet($authToken)) {
 			return false;
@@ -69,15 +69,52 @@ class Requester {
 		// Decodifica a resposta
 		$response = json_decode($this->httpConnector->getResponse(), true);
 		// Se houve sucesso
+		if ($this->httpConnector->requestSucceded() && !empty($response))
+			return $response;
+
+		// Retorna o erro em formato de objeto
+		$this->error = $response;
+		return false;
+	}
+
+	public function cancel($reference, $authToken) {
+
+		$order = $this->getOrderByReference($reference, $authToken);
+
+		if (empty($order))
+			return false;
+
+		$this->method = METHOD_PUT;
+		$this->URL = "{$this->baseURL}/orders/{$order['id']}";
+
+		if (!$this->sendPut(null, $authToken)) {
+			return false;
+		}
+		// Decodifica a resposta
+		$response = json_decode($this->httpConnector->getResponse(), true);
+		// Se houve sucesso
 		if ($this->httpConnector->requestSucceded()) {
+			return true;
+		}
+		// Retorna o erro em formato de objeto
+		$this->error = $response;
+		return false;
+	}
+
+	public function getStatus($reference, $authToken) {
+		
+		$order = $this->getOrderByReference($reference, $authToken);
+
+		if (!empty($order)) {
 			// Retorna o status do pagamento
-			$paymentStatus = isset($response['status']) ? $response['status'] : null;
+			$paymentStatus = isset($order['status']) ? $order['status'] : null;
 			if ($paymentStatus) {
 				if ($paymentStatus == 'REJECTED') {
 					return array(
 						'status' => $paymentStatus,
-						'reason' => $response['acquirer_message'],
-						'action' => $response['acquirer_action']
+						'reason' => isset($order['acquirer_message'])? $order['acquirer_message'] : null,
+						'action' => isset($order['acquirer_action'])? $order['acquirer_action'] : null,
+						'code' => isset($order['acquirer_code'])? $order['acquirer_code'] : null
 					);
 				} else {
 					return array('status' => $paymentStatus);
@@ -85,10 +122,8 @@ class Requester {
 			} else {
 				return false;
 			}
-		}
-		// Retorna o erro em formato de objeto
-		$this->error = $response;
-		return false;
+		} else return false;
+
 	}
 
 	private function updatePayment($response) {
@@ -108,6 +143,17 @@ class Requester {
 		$this->httpConnector->setUrl($this->URL);
 		$this->httpConnector->setData($data);
 		if (!$this->httpConnector->send($this->getPayment()->getAuthToken())) {
+			$this->error = $this->httpConnector->getError();
+			return false;
+		}
+		return true;
+	}
+
+	private function sendPut($data, $authToken) {
+		$this->httpConnector->setMethod($this->method);
+		$this->httpConnector->setUrl($this->URL);
+		$this->httpConnector->setData($data);
+		if (!$this->httpConnector->send($authToken)) {
 			$this->error = $this->httpConnector->getError();
 			return false;
 		}
