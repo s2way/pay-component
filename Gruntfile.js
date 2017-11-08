@@ -3,9 +3,6 @@ module.exports = function(grunt) {
         phpunit: {
             classes: {
                 dir: 'test/'
-            },
-            options: {
-                colors: true
             }
         },
         watch: {

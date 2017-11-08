@@ -1,8 +1,9 @@
 <?php
 
 use PayComponent\PayComponent;
+use PHPUnit\Framework\TestCase;
 
-class PayComponentTest extends PHPUnit_Framework_TestCase {
+class PayComponentTest extends TestCase {
 
     public function testPaymentCardValidationError() {
         $mockedPaymentCard = $this->getMockBuilder('PayComponent\PaymentCard')->setMethods(array('validate'))->getMock();

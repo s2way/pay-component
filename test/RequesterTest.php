@@ -4,8 +4,9 @@ use PayComponent\Requester;
 use PayComponent\PaymentCard;
 use PayComponent\PaymentToken;
 use PayComponent\Component\HttpConnector;
+use PHPUnit\Framework\TestCase;
 
-class RequesterTest extends PHPUnit_Framework_TestCase {
+class RequesterTest extends TestCase {
 
     public function setUp() {
 

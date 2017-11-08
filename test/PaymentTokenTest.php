@@ -2,20 +2,28 @@
 
 use PayComponent\PaymentToken;
 use PayComponent\Component\Validator;
+use PHPUnit\Framework\TestCase;
 
-class PaymentTokenTest extends PHPUnit_Framework_TestCase {
+class PaymentTokenTest extends TestCase {
 
     private $field = null;
 
     public function setUp() {
         $this->data = array(
-            'id' => 'order_id',
-            'description' => 'Description Teste',
-            'amount'  => 2500,
-            'issuer' => 'visa',
-            'payment_type'  => 'credit',
+            'id'           => 'order_id',
+            'description'  => 'Description Teste',
+            'amount'       => 2500,
+            'issuer'       => 'visa',
+            'payment_type' => 'credit',
             'installments' => 1,
-            'token' => '32165843216543213546514'
+            'token'        => '32165843216543213546514',
+            'street'     => 'ANY STREET',
+            'number'     => 15,
+            'complement' => 'NOTHING',
+            'city'       => 'ANY CITY',
+            'zip_code'   => 'ANY ZIP CODE',
+            'state'      => 'ANY STATE',
+            'country'    => 'ANY COUNTRY'
         );
     }
 
@@ -49,10 +57,10 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
         $this->data['auth_token'] = 'any';
 
         $expectedData = array(
-            'id' => $this->data['id'],
-            'auth_token' => $this->data['auth_token'],
+            'id'          => $this->data['id'],
+            'auth_token'  => $this->data['auth_token'],
             'description' => $this->data['description'],
-            'amount' => $this->data['amount'],
+            'amount'      => $this->data['amount'],
         );
 
         $pay = new PaymentToken();
@@ -65,11 +73,18 @@ class PaymentTokenTest extends PHPUnit_Framework_TestCase {
         $this->data['auth_token'] = 'any';
 
         $expectedData = array(
-            'issuer' => $this->data['issuer'],
+            'issuer'       => $this->data['issuer'],
             'payment_type' => $this->data['payment_type'],
             'installments' => $this->data['installments'],
-            'auth_token' => $this->data['auth_token'],
-            'token' => $this->data['token']
+            'auth_token'   => $this->data['auth_token'],
+            'token'        => $this->data['token'],
+            'street'       => $this->data['street'],
+            'number'       => $this->data['number'],
+            'complement'   => $this->data['complement'],
+            'city'         => $this->data['city'],
+            'zip_code'     => $this->data['zip_code'],
+            'state'        => $this->data['state'],
+            'country'      => $this->data['country']
         );
         $pay = new PaymentToken();
         $pay->setAuthToken($this->data['auth_token']);

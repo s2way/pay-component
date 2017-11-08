@@ -1,8 +1,9 @@
 <?php
 
 use PayComponent\Component\HttpConnector;
+use PHPUnit\Framework\TestCase;
 
-class HttpConnectorTest extends PHPUnit_Framework_TestCase {
+class HttpConnectorTest extends TestCase {
 
     public function testRequestSuccededStatusCode200(){
         $connector = new HttpConnector();

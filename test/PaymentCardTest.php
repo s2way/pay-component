@@ -2,23 +2,31 @@
 
 use PayComponent\PaymentCard;
 use PayComponent\Component\Validator;
+use PHPUnit\Framework\TestCase;
 
-class PaymentCardTest extends PHPUnit_Framework_TestCase {
+class PaymentCardTest extends TestCase {
 
     private $field = null;
 
     public function setUp() {
         $this->data = array(
-            'id' => 123,
-            'description' => 'Description test',
-            'amount' => 123456,
-            'issuer' => 'visa',
-            'card_number' => '153241251234154',
-            'due_date' => '072015',
+            'id'            => 123,
+            'description'   => 'Description test',
+            'amount'        => 123456,
+            'issuer'        => 'visa',
+            'card_number'   => '153241251234154',
+            'due_date'      => '072015',
             'security_code' => 619,
-            'card_holder' => 'TEST NAME',
-            'payment_type' => 'debit',
-            'installments' => 1
+            'card_holder'   => 'TEST NAME',
+            'payment_type'  => 'debit',
+            'installments'  => 1,
+            'street'     => 'ANY STREET',
+            'number'     => 15,
+            'complement' => 'NOTHING',
+            'city'       => 'ANY CITY',
+            'zip_code'   => 'ANY ZIP CODE',
+            'state'      => 'ANY STATE',
+            'country'    => 'ANY COUNTRY'
         );
     }
 
@@ -52,10 +60,10 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->data['auth_token'] = 'any';
 
         $expectedData = array(
-            'id' => $this->data['id'],
-            'auth_token' => $this->data['auth_token'],
+            'id'          => $this->data['id'],
+            'auth_token'  => $this->data['auth_token'],
             'description' => $this->data['description'],
-            'amount' => $this->data['amount'],
+            'amount'      => $this->data['amount'],
         );
 
         $pay = new PaymentCard();
@@ -68,14 +76,21 @@ class PaymentCardTest extends PHPUnit_Framework_TestCase {
         $this->data['auth_token'] = 'any';
 
         $expectedData = array(
-            'issuer' => $this->data['issuer'],
-            'card_number' => $this->data['card_number'],
-            'due_date' => $this->data['due_date'],
+            'issuer'        => $this->data['issuer'],
+            'card_number'   => $this->data['card_number'],
+            'due_date'      => $this->data['due_date'],
             'security_code' => $this->data['security_code'],
-            'card_holder' => $this->data['card_holder'],
-            'payment_type' => $this->data['payment_type'],
-            'installments' => $this->data['installments'],
-            'auth_token' => $this->data['auth_token']
+            'card_holder'   => $this->data['card_holder'],
+            'payment_type'  => $this->data['payment_type'],
+            'installments'  => $this->data['installments'],
+            'auth_token'    => $this->data['auth_token'],
+            'street'     => $this->data['street'],
+            'number'     => $this->data['number'],
+            'complement' => $this->data['complement'],
+            'city'       => $this->data['city'],
+            'zip_code'   => $this->data['zip_code'],
+            'state'      => $this->data['state'],
+            'country'    => $this->data['country']
         );
         $pay = new PaymentCard();
         $pay->setAuthToken($this->data['auth_token']);
