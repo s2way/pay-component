@@ -19,7 +19,18 @@ class PaymentCardTest extends TestCase {
             'security_code' => 619,
             'card_holder'   => 'TEST NAME',
             'payment_type'  => 'debit',
-            'installments'  => 1
+            'installments'  => 1,
+            'Customer' => array(
+                'birthdate' => '1988-04-07',
+                'street' => '123',
+                'number' => '123',
+                'city' => '123',
+                'zip_code' => '93346440',
+                'state' => 'rs',
+                'country' => 'brasil',
+                'name' => 'Usuário Desenv',
+                'email' => 'usuario@desenv.com.br',
+            )
         );
     }
 
@@ -76,11 +87,23 @@ class PaymentCardTest extends TestCase {
             'card_holder'   => $this->data['card_holder'],
             'payment_type'  => $this->data['payment_type'],
             'installments'  => $this->data['installments'],
-            'auth_token'    => $this->data['auth_token']
+            'auth_token'    => $this->data['auth_token'],
+            'Customer' => array(
+                'birthdate' => $this->data['Customer']['birthdate'],
+                'street'    => $this->data['Customer']['street'],
+                'number'    => $this->data['Customer']['number'],
+                'city'      => $this->data['Customer']['city'],
+                'zip_code'  => $this->data['Customer']['zip_code'],
+                'state'     => $this->data['Customer']['state'],
+                'country'   => $this->data['Customer']['country'],
+                'name'      => $this->data['Customer']['name'],
+                'email'     => $this->data['Customer']['email']
+            )
         );
         $pay = new PaymentCard();
         $pay->setAuthToken($this->data['auth_token']);
         $pay->setData($this->data);
+
         $this->assertEquals($expectedData, $pay->getProcessData());
     }
 

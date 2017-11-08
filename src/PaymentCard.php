@@ -15,7 +15,7 @@ class PaymentCard extends Payment {
     }
 
     public function getProcessData() {
-        return array_intersect_key($this->data, array_flip($this->processFields));
+        return array_merge(array_intersect_key($this->data, array_flip($this->processFields)), array_intersect_key($this->data, $this->customerFields));
     }
 
     public function setToken($token) {

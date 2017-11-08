@@ -10,6 +10,7 @@ abstract class Payment {
     private $authToken = null;
     private $returnURL = null;
     protected $creationFields = array('id', 'auth_token', 'description', 'amount', 'client_app');
+    protected $customerFields = array('Customer' => array('name','email','street','number','complement','city','zip_code','state','country'));
 
     protected abstract function getCreationData();
     protected abstract function getProcessData();
