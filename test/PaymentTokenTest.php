@@ -18,12 +18,7 @@ class PaymentTokenTest extends TestCase {
             'installments' => 1,
             'token'        => '32165843216543213546514',
             'street'     => 'ANY STREET',
-            'number'     => 15,
-            'complement' => 'NOTHING',
-            'city'       => 'ANY CITY',
-            'zip_code'   => 'ANY ZIP CODE',
-            'state'      => 'ANY STATE',
-            'country'    => 'ANY COUNTRY'
+            'number'     => 15
         );
     }
 
@@ -77,14 +72,7 @@ class PaymentTokenTest extends TestCase {
             'payment_type' => $this->data['payment_type'],
             'installments' => $this->data['installments'],
             'auth_token'   => $this->data['auth_token'],
-            'token'        => $this->data['token'],
-            'street'       => $this->data['street'],
-            'number'       => $this->data['number'],
-            'complement'   => $this->data['complement'],
-            'city'         => $this->data['city'],
-            'zip_code'     => $this->data['zip_code'],
-            'state'        => $this->data['state'],
-            'country'      => $this->data['country']
+            'token'        => $this->data['token']
         );
         $pay = new PaymentToken();
         $pay->setAuthToken($this->data['auth_token']);

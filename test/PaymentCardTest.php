@@ -19,14 +19,7 @@ class PaymentCardTest extends TestCase {
             'security_code' => 619,
             'card_holder'   => 'TEST NAME',
             'payment_type'  => 'debit',
-            'installments'  => 1,
-            'street'     => 'ANY STREET',
-            'number'     => 15,
-            'complement' => 'NOTHING',
-            'city'       => 'ANY CITY',
-            'zip_code'   => 'ANY ZIP CODE',
-            'state'      => 'ANY STATE',
-            'country'    => 'ANY COUNTRY'
+            'installments'  => 1
         );
     }
 
@@ -83,14 +76,7 @@ class PaymentCardTest extends TestCase {
             'card_holder'   => $this->data['card_holder'],
             'payment_type'  => $this->data['payment_type'],
             'installments'  => $this->data['installments'],
-            'auth_token'    => $this->data['auth_token'],
-            'street'     => $this->data['street'],
-            'number'     => $this->data['number'],
-            'complement' => $this->data['complement'],
-            'city'       => $this->data['city'],
-            'zip_code'   => $this->data['zip_code'],
-            'state'      => $this->data['state'],
-            'country'    => $this->data['country']
+            'auth_token'    => $this->data['auth_token']
         );
         $pay = new PaymentCard();
         $pay->setAuthToken($this->data['auth_token']);
